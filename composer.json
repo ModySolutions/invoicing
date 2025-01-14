@@ -1,0 +1,17 @@
+{
+    "name": "modycloud/invoice",
+    "description": "Invoicing with Mody Cloud",
+    "autoload": {
+        "psr-4": {
+            "Invoice\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Javier Troya",
+            "email": "javo@modysolutions.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
