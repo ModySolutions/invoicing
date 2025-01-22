@@ -2,24 +2,26 @@
 
 namespace Invoice\Hooks\Invoice;
 
+use function Env\env;
+
 class Post {
-    public static function register_post_type() : void {
-        register_post_type( 'invoice', array(
+    public static function register_post_type(): void {
+        register_post_type('invoice', array(
             'labels' => array(
                 'name' => __('Invoices'),
                 'singular_name' => __('Invoice'),
-                'menu_name' => __('Invoice'),
-                'all_items' => __('All Invoice'),
+                'menu_name' => __('Invoices'),
+                'all_items' => __('All Invoices'),
                 'edit_item' => __('Edit Invoice'),
                 'view_item' => __('View Invoice'),
-                'view_items' => __('View Invoice'),
+                'view_items' => __('View Invoices'),
                 'add_new_item' => __('Add New Invoice'),
                 'add_new' => __('Add New Invoice'),
                 'new_item' => __('New Invoice'),
                 'parent_item_colon' => __('Parent Invoice:'),
                 'search_items' => __('Search Invoice'),
-                'not_found' => __('No invoice found'),
-                'not_found_in_trash' => __('No invoice found in Trash'),
+                'not_found' => __('No invoices found'),
+                'not_found_in_trash' => __('No invoices found in Trash'),
                 'archives' => __('Invoice Archives'),
                 'attributes' => __('Invoice Attributes'),
                 'insert_into_item' => __('Insert into invoice'),
@@ -40,18 +42,130 @@ class Post {
             'exclude_from_search' => true,
             'show_in_nav_menus' => false,
             'show_in_rest' => true,
+            'publicly_queryable' => false,
             'menu_position' => 9,
-            'menu_icon' => 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#005f6b"><path d="M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>'),
+            'menu_icon' => 'data:image/svg+xml;base64,'.
+                base64_encode('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#005f6b"><path d="M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>'),
             'supports' => array(
-                0 => 'title',
-                1 => 'author',
-                2 => 'custom-fields',
+                'author',
+                'custom-fields',
             ),
-            'has_archive' => true,
-            'rewrite' => array(
-                'feeds' => false,
-            ),
+            'has_archive' => false,
             'delete_with_user' => false,
-        ) );
+        ));
+    }
+
+    public static function register_post_status(): void {
+        foreach(self::_get_statuses_array() as $invoice_status => $data) {
+            register_post_status($invoice_status, $data);
+        }
+    }
+
+    public static function post_submitbox_misc_actions() : void {
+        global $post;
+
+        if( $post->post_type == 'invoice' ){
+            $options = '';
+            $label = '';
+            $button_label = __('Save Invoice');
+
+            foreach(self::_get_statuses_array() as $invoice_status => $data) {
+                $complete = '';
+                if( $post->post_status == $invoice_status ){
+                    $complete = 'selected=\"selected\"';
+                    $label = " {$data['label']}";
+                    $button_label = sprintf(__('Save %s Invoice'), $data['label']);
+                }
+                $options .= "<option value=\"{$invoice_status}\" $complete>{$data['label']}</option>";
+            }
+
+            echo <<<EOF
+<script>
+jQuery(document).ready(function($){
+    $("select#post_status").html('');
+    $("select#post_status").append('{$options}');
+    $("#post-status-display").text('{$label}');
+});
+</script>
+<style>
+  #publish {
+    display: none;
+  }
+</style>
+EOF;
+        }
+    }
+
+    public static function save_post_invoice(int $post_id, \WP_Post $post, bool $update) : void {
+        global $wpdb;
+        $uuid = get_post_meta($post_id, 'uuid', true);
+        $invoice_number = get_field('invoice_number', $post_id);
+        $wpdb->update(
+            $wpdb->posts,
+            array(
+                'post_title' => "{$uuid}-{$invoice_number}",
+                'post_content' => APP_INVOICE_BLOCK_CONTENT,
+                'post_name' => get_post_meta($post_id, 'uuid', true),
+            ),
+            array(
+                'ID' => $post_id
+            )
+        );
+        update_post_meta($post_id, 'app_filter_the_permalink', 1);
+    }
+
+    private static function _get_statuses_array() : array {
+        return array(
+            'invoice-draft' => array(
+                'label' => _x('Draft', 'invoice post status'),
+                'public' => true,
+                'show_in_admin_all_list' => true,
+                'show_in_admin_status_list' => true,
+                'date_floating' => true,
+                'label_count' => _n_noop('Draft <span class="count">(%s)</span>', 'Drafts <span class="count">(%s)</span>')
+            ),
+            'invoice-issued' => array(
+                'label' => _x('Issued', 'invoice post status'),
+                'public' => true,
+                'show_in_admin_all_list' => true,
+                'show_in_admin_status_list' => true,
+                'date_floating' => true,
+                'label_count' => _n_noop('Issued <span class="count">(%s)</span>', 'Issued <span class="count">(%s)</span>')
+            ),
+            'invoice-sent' => array(
+                'label' => _x('Sent', 'invoice post status'),
+                'public' => true,
+                'show_in_admin_all_list' => true,
+                'show_in_admin_status_list' => true,
+                'date_floating' => true,
+                'label_count' => _n_noop('Sent <span class="count">(%s)</span>', 'Sent <span class="count">(%s)</span>')
+            ),
+            'invoice-expired' => array(
+                'label' => _x('Expired', 'invoice post status'),
+                'public' => true,
+                'show_in_admin_all_list' => true,
+                'show_in_admin_status_list' => true,
+                'date_floating' => true,
+                'label_count' => _n_noop('Expired <span class="count">(%s)</span>',
+                    'Expired <span class="count">(%s)</span>')
+            ),
+            'invoice-paid' => array(
+                'label' => _x('Paid', 'invoice post status'),
+                'public' => true,
+                'show_in_admin_all_list' => true,
+                'show_in_admin_status_list' => true,
+                'date_floating' => true,
+                'label_count' => _n_noop('Paid <span class="count">(%s)</span>', 'Paid <span class="count">(%s)</span>')
+            ),
+            'invoice-cancelled' => array(
+                'label' => _x('Cancelled', 'invoice post status'),
+                'public' => true,
+                'show_in_admin_all_list' => true,
+                'show_in_admin_status_list' => true,
+                'date_floating' => true,
+                'label_count' => _n_noop('Cancelled <span class="count">(%s)</span>',
+                    'Cancelled <span class="count">(%s)</span>')
+            ),
+        );
     }
 }

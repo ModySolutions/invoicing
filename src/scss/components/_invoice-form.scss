@@ -1,0 +1,52 @@
+.invoice-form {
+  .logo {
+
+  }
+
+  >.grid {
+    grid-template-columns: 1fr;
+
+    @media all and (min-width: 60rem) {
+      & {
+        grid-template-columns: 3fr 1fr;
+      }
+
+      .sender,
+      .client {
+        max-width: 21.875rem;
+      }
+    }
+
+    @media all and (max-width: 80.625rem) {
+      & {
+        grid-template-columns: 3fr 1fr;
+      }
+    }
+  }
+
+  .invoice-header {
+    grid-template-columns: 1fr 1fr;
+
+    .invoice-number {
+      max-width: 18.75rem;
+      &-label {
+        position: absolute;
+        padding: .3rem .5rem;
+      }
+    }
+  }
+
+  .sidebar {
+    max-width: 21.875rem;
+    @media all and (max-width: 80.625rem) {
+      & {
+        width: 12.5rem;
+        margin-right: 1rem;
+      }
+    }
+
+    @media all and (max-width: 42.5rem) {
+      display: none;
+    }
+  }
+}

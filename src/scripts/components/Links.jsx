@@ -1,20 +1,13 @@
-import { useState, useEffect } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
+import {useState} from "react";
+import {navigate} from "@modycloud/tools/navigate";
 
-const Links = ({ routes }) => {
+const Links = ({ routes, locationPathname = '/invoices/' }) => {
     if (!routes || Object.keys(routes).length === 0) {
         return '';
     }
 
-    const [currentPath, setCurrentPath] = useState(window.location.pathname);
-
-    const navigate = (event) => {
-        event.preventDefault();
-        const link = event.currentTarget.getAttribute('href');
-        setCurrentPath(link);
-        window.history.pushState({}, '', link);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-    }
+    const [currentPath, setCurrentPath] = useState(locationPathname);
 
     const routesEntries = Object.entries(routes).map(([key, value]) => ({
         link: key.endsWith('/') ? key : `${key}/`,
@@ -27,7 +20,11 @@ const Links = ({ routes }) => {
                 return <a
                     href={link}
                     key={link}
-                    onClick={navigate}
+                    onClick={(event) => {
+                        const link = event.currentTarget.getAttribute('href');
+                        setCurrentPath(link);
+                        navigate(event);
+                    }}
                     className={`link${currentPath === link ? ' active' : ''}`}
                 >
                     {__(title)}

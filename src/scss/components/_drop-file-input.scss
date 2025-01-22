@@ -1,0 +1,21 @@
+.drop-file-input {
+  &__label {
+
+    .logo:hover {
+      .close {
+        display: flex;
+      }
+    }
+
+    .close {
+      border-radius: 50%;
+      background-color: var(--color-danger);
+      color: var(--color-black);
+      width: 1.25rem;
+      height: 1.25rem;
+      justify-content: center;
+      align-items: center;
+      display: none;
+    }
+  }
+}

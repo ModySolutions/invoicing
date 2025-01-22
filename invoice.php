@@ -17,6 +17,7 @@ namespace Invoice;
 
 define('APP_INVOICE_DIR', __DIR__);
 define('APP_INVOICE_DIR_URL', plugin_dir_url(__FILE__));
+define('APP_INVOICE_BLOCK_CONTENT', '<!-- wp:app/invoice {"name":"app/invoice","data":array(),"mode":"edit"} /-->');
 
 require_once __DIR__ . '/vendor/autoload.php';
 class Invoice
