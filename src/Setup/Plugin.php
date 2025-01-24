@@ -3,7 +3,7 @@
 namespace Invoice\Setup;
 
 class Plugin {
-    const last_update = 'Rare|Backache|Length|Peculiar94';
+    const last_update = 'Rare|Backache|Length|Peculiar939';
     public static function init() : void {
         add_action('init', self::wp_init(...));
         add_action('wp_enqueue_scripts', self::wp_enqueue_scripts(...), 100);
@@ -56,7 +56,8 @@ class Plugin {
                 7 => __('7% - Professionals in the first two years of activity', APP_THEME_LOCALE),
                 15 => __('15 % - Professionals', APP_THEME_LOCALE),
                 19 => __('19% - Rent or Interest (capital assets)', APP_THEME_LOCALE),
-                '2.8' => __('2.8% - Professionals in the first two years of activity (Ceuta and Melilla)',APP_THEME_LOCALE),
+                '2.8' => __('2.8% - Professionals in the first two years of activity (Ceuta and Melilla)',
+                    APP_THEME_LOCALE),
                 6 => __('6% - Professionals (from Ceuta and Melilla)',APP_THEME_LOCALE),
                 '7.6' => __('7.6% - Rental (Ceuta and Melilla)',APP_THEME_LOCALE),
             );

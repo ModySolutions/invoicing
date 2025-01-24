@@ -14,11 +14,11 @@ const InvoiceForm = () => {
     const [dateFormat, setDateFormat] = useState('MMM d, Y');
     const {currentPath, setCurrentPath} = useSettings();
     const defaultItemValues = {
-        'description': '',
-        'quantity': '',
-        'price': '',
-        'taxable': true,
-        'amount': '0',
+        'item_description': '',
+        'item_quantity': '',
+        'item_price': '',
+        'item_taxable': true,
+        'item_total': '0',
     };
     const [invoiceItems, setInvoiceItems] = useState([defaultItemValues]);
     const [invoiceSubtotal, setInvoiceSubtotal] = useState(0);
@@ -29,6 +29,12 @@ const InvoiceForm = () => {
     const [selectedInvoiceDiscount, setSelectedInvoiceDiscount] = useState('');
     const [invoiceNumber, setInvoiceNumber] = useState('');
     const [invoiceSender, setInvoiceSender] = useState('');
+    const [formData, setFormData] = useState({
+        invoice_client: '',
+        invoice_notes: '',
+        invoice_terms: '',
+    });
+    const [logo, setLogo] = useState(settings?.invoice_logo ?? '')
 
     useEffect(() => {
         const header = document.querySelector('.header');
@@ -69,15 +75,8 @@ const InvoiceForm = () => {
             ].join("\n"))
         }
 
-        if (settings?.invoice_logo) {
-            apiFetch({
-                path: 'wp/v2/settings',
-                method: 'POST',
-                data: {'site_logo': settings?.invoice_logo_id}
-            })
-            .then((response) => {
-                console.log(response)
-            })
+        if(settings?.invoice_logo) {
+            setLogo(settings?.invoice_logo)
         }
 
         return () => {
@@ -104,16 +103,27 @@ const InvoiceForm = () => {
         handleTaxesAndDiscounts();
     }, [selectedInvoiceTax, selectedInvoiceDiscount]);
 
+    const syncSiteLogo = (invoice_logo_id) => {
+        apiFetch({
+            path: 'wp/v2/settings',
+            method: 'POST',
+            data: {'site_logo': invoice_logo_id}
+        })
+        .then(() => {
+
+        })
+    }
+
     const handleTaxesAndDiscounts = () => {
         let subtotal = 0;
         let taxes = 0;
         let discounts = 0;
 
         invoiceItems.forEach(item => {
-            const itemAmount = (parseFloat(item.amount) || 0);
+            const itemAmount = (parseFloat(item.item_total) || 0);
             subtotal += itemAmount;
-            if (item.taxable) {
-                taxes += (itemAmount * selectedInvoiceTax) / 100; // Sumar solo impuestos si taxable es true
+            if (item.item_taxable) {
+                taxes += (itemAmount * selectedInvoiceTax) / 100;
             }
         });
 
@@ -137,10 +147,10 @@ const InvoiceForm = () => {
             updatedItems[index][name] = value;
         }
 
-        if (name === 'quantity' || name === 'price') {
-            const quantity = updatedItems[index].quantity || 0;
-            const price = updatedItems[index].price || 0;
-            updatedItems[index].amount = (quantity * price).toFixed(2);
+        if (name === 'item_quantity' || name === 'item_price') {
+            const quantity = updatedItems[index].item_quantity || 0;
+            const price = updatedItems[index].item_price || 0;
+            updatedItems[index].item_total = (quantity * price).toFixed(2);
         }
 
         setInvoiceItems(updatedItems);
@@ -162,6 +172,14 @@ const InvoiceForm = () => {
         handleTaxesAndDiscounts();
     }
 
+    const handleTextChange = (event) => {
+        const {name, value} = event.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value,
+        }))
+    }
+
     const addItem = () => {
         setInvoiceItems([...invoiceItems, {...defaultItemValues}]);
     };
@@ -173,7 +191,50 @@ const InvoiceForm = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(invoiceItems);
+        const data = {
+            ...formData,
+            ...{
+                'invoice_number': invoiceNumber,
+                'invoice_issue_date': issuedDate,
+                'invoice_due_date': dueDate,
+                'invoice_sender': invoiceSender,
+                'invoice_items': invoiceItems,
+                'invoice_taxes': [
+                    {
+                        'invoice_tax_name': 'I.V.A.',
+                        'invoice_tax_type': 'percentage',
+                        'invoice_tax_amount': selectedInvoiceTax,
+                        'invoice_tax_total': invoiceTaxes
+                    }
+                ],
+                'invoice_discounts': [
+                    {
+                        'invoice_discount_name': 'I.R.P.F.',
+                        'invoice_discount_type': 'percentage',
+                        'invoice_discount_amount': selectedInvoiceDiscount,
+                        'invoice_discount_total': invoiceDiscounts,
+                    }
+                ],
+                'invoice_subtotal': invoiceSubtotal,
+                'invoice_total': invoiceTotal,
+                'invoice_tax_value': selectedInvoiceTax,
+                'invoice_discount_value': selectedInvoiceDiscount,
+                'invoice_logo': logo,
+                'invoice_currency': settings?.invoice_currency,
+                'invoice_currency_symbol': settings?.invoice_currency_symbol
+            }
+        }
+
+        apiFetch({
+            path: 'wp/v2/invoice',
+            method: 'POST',
+            data: data,
+        })
+        .then((response) => {
+            console.log(response);
+        })
+
+        console.log(data);
     };
 
     return (
@@ -188,7 +249,9 @@ const InvoiceForm = () => {
                                     'invoice_logo': elem?.source_url,
                                     'invoice_logo_id': elem?.id,
                                 }))
-                            }}/>
+                                syncSiteLogo(elem?.id ?? 0);
+                                setLogo(elem?.source_url);
+                            }} logo={logo ?? ''}/>
                         </div>
                         <div className='right flex flex-column justify-space-between gap-2 text-right'>
                             <div className='flex justify-end flex-column items-end'>
@@ -231,12 +294,13 @@ const InvoiceForm = () => {
                             <div className='client w-100-p mt-3'>
                                 <label htmlFor='client'>{__('Bill to:', 'app')}</label>
                                 <textarea required
-                                    className={'input-lg no-resize'}
-                                    placeholder={__('Who is this to?', 'app')}
-                                    name='client'
-                                    id='client'
-                                    cols='30'
-                                    rows='3'></textarea>
+                                          className={'input-lg no-resize'}
+                                          placeholder={__('Who is this to?', 'app')}
+                                          name='invoice_client'
+                                          onChange={handleTextChange}
+                                          id='client'
+                                          cols='30'
+                                          rows='3'></textarea>
                             </div>
                         </div>
                         <div className='right flex flex-column justify-end mt-3'>
@@ -282,38 +346,38 @@ const InvoiceForm = () => {
                                     <tr key={`invoice-item-${index}`} className='border-0'>
                                         <td data-title={__('Description', 'app')}>
                                             <input required
-                                                type={'text'}
-                                                name='description'
-                                                value={item.description}
-                                                onChange={(event) => handleInputChange(index, event)}
+                                                   type={'text'}
+                                                   name='item_description'
+                                                   value={item.item_description}
+                                                   onChange={(event) => handleInputChange(index, event)}
                                             />
                                         </td>
                                         <td data-title={__('Quantity', 'app')}>
                                             <input required
-                                                type={'text'}
-                                                name='quantity'
-                                                value={item.quantity}
-                                                onChange={(event) => handleInputChange(index, event)}
+                                                   type={'text'}
+                                                   name='item_quantity'
+                                                   value={item.item_quantity}
+                                                   onChange={(event) => handleInputChange(index, event)}
                                             />
                                         </td>
                                         <td data-title={__('Price', 'app')}>
                                             <input required
-                                                type={'text'}
-                                                name='price'
-                                                value={item.price}
-                                                onChange={(event) => handleInputChange(index, event)}
+                                                   type={'text'}
+                                                   name='item_price'
+                                                   value={item.item_price}
+                                                   onChange={(event) => handleInputChange(index, event)}
                                             />
                                         </td>
                                         <td className={'text-center'} data-title={__('Taxable', 'app')}>
                                             <input
                                                 type={'checkbox'}
-                                                name='taxable'
-                                                checked={item.taxable}
+                                                name='item_taxable'
+                                                checked={item.item_taxable}
                                                 onChange={(event) => handleInputChange(index, event)}
                                             />
                                         </td>
                                         <td className='text-right' data-title={__('Amount', 'app')}>
-                                            <CurrencyFormatter amount={item.amount}/>
+                                            <CurrencyFormatter amount={item.item_total}/>
                                         </td>
                                         <td className={'hidden-action text-right'}>
                                             {index !== 0 && (
@@ -354,7 +418,8 @@ const InvoiceForm = () => {
                                                 'Notes - any relevant information not already covered',
                                                 'app'
                                             )}
-                                            name='notes'
+                                            onChange={handleTextChange}
+                                            name='invoice_notes'
                                             id='notes'
                                             cols='30'
                                             rows='3'></textarea>
@@ -370,7 +435,8 @@ const InvoiceForm = () => {
                                                 'Terms and conditions - late fees, payment methods, delivery schedule',
                                                 'app'
                                             )}
-                                            name='terms'
+                                            onChange={handleTextChange}
+                                            name='invoice_terms'
                                             id='terms'
                                             cols='30'
                                             rows='3'></textarea>
@@ -421,26 +487,31 @@ const InvoiceForm = () => {
                         {__('Save Invoice', 'app')}
                     </button>
                     <hr className='b-bottom-grey-10-4 mx-4'/>
-                    <div className='invoice-taxes flex flex-column items-center gap-y-2'>
-                        <select name='iva'
-                                id='iva'
-                                onChange={handleSelectChange}
-                                value={selectedInvoiceTax}
-                                className={'text-right'}>
-                            {settings?.spain_iva && Object.entries(settings?.spain_iva).map(([value, label]) => (
-                                <option key={`option_iva_${value}`} value={value}>{label}</option>
-                            ))}
-                        </select>
-                        <hr className={'my-2'}/>
-                        <select name='irpf'
-                                id='irpf'
-                                className={'text-right'}
-                                onChange={handleSelectChange}
-                                value={selectedInvoiceDiscount}>
-                            {settings?.spain_irpf && Object.entries(settings?.spain_irpf).map(([value, label]) => (
-                                <option key={`option_irpf_${value}`} value={value}>{label}</option>
-                            ))}
-                        </select>
+                    <div className='grid grid-cols-2 gap-1'>
+                        <div className='flex flex-column'>
+                            <label htmlFor='iva'>{__('I.V.A.', 'app')}</label>
+                            <select name='iva'
+                                    id='iva'
+                                    onChange={handleSelectChange}
+                                    value={selectedInvoiceTax}
+                                    className={'text-right'}>
+                                {settings?.spain_iva && Object.entries(settings?.spain_iva).map(([value, label]) => (
+                                    <option key={`option_iva_${value}`} value={value}>{label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className='flex flex-column'>
+                            <label htmlFor='iva'>{__('I.R.P.F.', 'app')}</label>
+                            <select name='irpf'
+                                    id='irpf'
+                                    className={'text-right'}
+                                    onChange={handleSelectChange}
+                                    value={selectedInvoiceDiscount}>
+                                {settings?.spain_irpf && Object.entries(settings?.spain_irpf).map(([value, label]) => (
+                                    <option key={`option_irpf_${value}`} value={value}>{label}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </aside>
             </div>

@@ -2,17 +2,25 @@ import React, {useRef, useState} from 'react';
 import {__} from '@wordpress/i18n';
 import PropTypes from 'prop-types';
 import apiFetch from '@wordpress/api-fetch';
+import {useEffect} from "@wordpress/element";
 
 const DropFileInput = props => {
     const wrapperRef = useRef(null);
     const [fileList, setFileList] = useState([]);
-    const [logo, setLogo] = useState('');
+    const [logo, setLogo] = useState(props?.logo);
     const [className, setClassName] = useState('bg-cultured');
     const [uploading, setUploading] = useState(false);
 
     const onDragEnter = () => wrapperRef.current.classList.add('dragover');
     const onDragLeave = () => wrapperRef.current.classList.remove('dragover');
     const onDrop = () => wrapperRef.current.classList.remove('dragover');
+
+    useEffect(() => {
+        if(props?.logo) {
+            setLogo(props?.logo);
+            setClassName('bg-white');
+        }
+    }, [props])
 
     const onFileDrop = async (e) => {
         const newFile = e.target.files[0];
