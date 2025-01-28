@@ -1,4 +1,3 @@
-import {v4 as uuidv4} from "uuid";
 import {__} from '@wordpress/i18n';
 import {useInvoices} from "../contexts/InvoicesContext";
 
@@ -14,13 +13,16 @@ const StatusButton = ({textClassName, bgClassName, status, label, onClick, activ
 };
 
 const InvoiceStatuses = ({statuses}) => {
-    const {currentStatus, setCurrentStatus} = useInvoices();
+    const {currentStatus, setCurrentStatus, setCurrentStatusLabel} = useInvoices();
     return (
         <div className={'flex gap-1 justify-start'}>
             <StatusButton
                 textClassName='text-charcoal'
                 bgClassName='btn-grey-80'
-                onClick={() => setCurrentStatus('any')}
+                onClick={() => {
+                    setCurrentStatus('any')
+                    setCurrentStatusLabel(__('Any', 'app'));
+                }}
                 active={currentStatus === 'any'}
                 status='any'
                 label={__('Any')}/>
@@ -31,10 +33,13 @@ const InvoiceStatuses = ({statuses}) => {
                     textClassName={textClassName}
                     bgClassName={bgClassName}
                     status={status}
-                    onClick={() => setCurrentStatus(status)}
+                    onClick={() => {
+                        setCurrentStatus(status);
+                        setCurrentStatusLabel(data?.name)
+                    }}
                     active={currentStatus === status}
                     label={data?.name}
-                    key={`invoice-status-filter-btn-${uuidv4()}`}
+                    key={`invoice-status-filter-btn-${status}`}
                 />
             })}
         </div>

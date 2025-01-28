@@ -27,48 +27,8 @@ class Meta {
         \WP_REST_Request $request
     ): \WP_REST_Response {
         if ('invoice' === $invoice->post_type) {
-
-            $date_format = get_option('invoice_date_format', get_option('date_format'));
             $invoice_id = $invoice->ID;
-            $stored_invoice_series_number = get_field('invoice_series_number', $invoice_id);
-            $stored_invoice_number = get_field('invoice_number', $invoice_id);
-            $invoice_number = '';
-            if($stored_invoice_series_number) {
-                $invoice_number = "{$stored_invoice_number}-";
-            }
-            $uuid = get_post_meta($invoice_id, 'uuid', true);
-            $invoice_view_url = "/invoices/view/{$uuid}";
-            $invoice_edit_url = "/invoices/edit/{$uuid}";
-            $invoice_number .= $stored_invoice_number;
-            $response->data = array(
-                'ID' => $invoice_id,
-                'UUID' => $uuid,
-                'invoice_series_number' => $stored_invoice_series_number,
-                'invoice_number' => $stored_invoice_number,
-                'generated_invoice_number' => $invoice_number,
-                'invoice_issue_date' => get_field(
-                    'invoice_issue_date',
-                    $invoice_id
-                ),
-                'invoice_due_date' => get_field(
-                    'invoice_due_date',
-                    $invoice_id
-                ),
-                'invoice_sender' => get_field('invoice_sender', $invoice_id, false),
-                'invoice_client' => get_field('invoice_client', $invoice_id, false),
-                'invoice_sender_address' => get_field('invoice_sender_address', $invoice_id, false),
-                'invoice_client_address' => get_field('invoice_client_address', $invoice_id, false),
-                'invoice_items' => get_field('invoice_items', $invoice_id),
-                'invoice_status' => get_post_status($invoice_id),
-                'invoice_taxes' => get_field('invoice_taxes', $invoice_id),
-                'invoice_discounts' => get_field('invoice_discounts', $invoice_id),
-                'invoice_subtotal' => get_field('invoice_subtotal', $invoice_id),
-                'invoice_tax_subtotal' => get_field('invoice_tax_subtotal', $invoice_id),
-                'invoice_discount_subtotal' => get_field('invoice_discount_subtotal', $invoice_id),
-                'invoice_total' => get_field('invoice_total', $invoice_id),
-                'invoice_view_url' => $invoice_view_url,
-                'invoice_edit_url' => $invoice_edit_url,
-            );
+            $response->data = self::schema($invoice_id);
         }
 
         return $response;
@@ -84,12 +44,12 @@ class Meta {
         }
 
         $status_to_color = array(
-            'invoice-draft' => array('btn-text-charcoal', 'btn-chinese-white'),
-            'invoice-issued' => array('btn-text-charcoal-inverse', 'btn-secondary'),
-            'invoice-sent' => array('btn-text-info-dark', 'btn-info-light'),
-            'invoice-paid' => array('btn-text-success-dark', 'btn-success-light'),
-            'invoice-expired' => array('btn-text-warning-dark', 'btn-warning-light'),
-            'invoice-cancelled' => array('btn-text-danger-dark', 'btn-danger-light'),
+            'invoice_draft' => array('btn-text-charcoal', 'btn-chinese-white'),
+            'invoice_issued' => array('btn-text-charcoal-inverse', 'btn-secondary'),
+            'invoice_sent' => array('btn-text-info-dark', 'btn-info-light'),
+            'invoice_paid' => array('btn-text-success-dark', 'btn-success-light'),
+            'invoice_expired' => array('btn-text-warning-dark', 'btn-warning-light'),
+            'invoice_cancelled' => array('btn-text-danger-dark', 'btn-danger-light'),
         );
 
         $response->data = array_merge($response->data, array(
@@ -97,5 +57,53 @@ class Meta {
         ));
 
         return $response;
+    }
+
+    public static function schema($invoice_id) : array {
+        $stored_invoice_series_number = get_field('invoice_series_number', $invoice_id);
+        $stored_invoice_number = get_field('invoice_number', $invoice_id);
+        $invoice_number = '';
+        if($stored_invoice_series_number) {
+            $invoice_number = "{$stored_invoice_number}-";
+        }
+        $invoice_number .= $stored_invoice_number;
+        $invoice_number = $stored_invoice_number === 99999 ? null : $invoice_number;
+        $uuid = get_post_meta($invoice_id, 'uuid', true);
+        $invoice_view_url = "/invoices/view/{$uuid}";
+        $invoice_edit_url = "/invoices/edit/{$uuid}";
+        return array(
+            'ID' => $invoice_id,
+            'UUID' => $uuid,
+            'invoice_series_number' => $stored_invoice_series_number,
+            'invoice_number' => $stored_invoice_number,
+            'generated_invoice_number' => $invoice_number,
+            'invoice_issue_date' => get_field(
+                'invoice_issue_date',
+                $invoice_id,
+                false
+            ),
+            'invoice_due_date' => get_field(
+                'invoice_due_date',
+                $invoice_id,
+                false
+            ),
+            'invoice_sender' => get_field('invoice_sender', $invoice_id),
+            'invoice_client' => get_field('invoice_client', $invoice_id),
+            'invoice_sender_address' => get_field('invoice_sender_address', $invoice_id),
+            'invoice_client_address' => get_field('invoice_client_address', $invoice_id),
+            'invoice_items' => get_field('invoice_items', $invoice_id),
+            'invoice_status' => get_post_status($invoice_id),
+            'invoice_taxes' => get_field('invoice_taxes', $invoice_id),
+            'invoice_discounts' => get_field('invoice_discounts', $invoice_id),
+            'invoice_subtotal' => get_field('invoice_subtotal', $invoice_id),
+            'invoice_tax_subtotal' => get_field('invoice_tax_subtotal', $invoice_id),
+            'invoice_discount_subtotal' => get_field('invoice_discount_subtotal', $invoice_id),
+            'invoice_total' => get_field('invoice_total', $invoice_id),
+            'invoice_view_url' => $invoice_view_url,
+            'invoice_edit_url' => $invoice_edit_url,
+            'invoice_notes' => get_field('invoice_notes', $invoice_id),
+            'invoice_terms' => get_field('invoice_terms', $invoice_id),
+            'invoice_logo' => get_field('invoice_logo', $invoice_id),
+        );
     }
 }

@@ -1,11 +1,13 @@
-import {useEffect, useState} from "react";
-import {v4 as uuidv4} from "uuid";
-import {__} from '@wordpress/i18n';
+import {sprintf, __} from '@wordpress/i18n';
 import {useInvoices} from "@invoice/contexts/InvoicesContext";
 import InvoiceRow from '@invoice/components/InvoiceRow';
 
 const InvoicesList = ({statuses}) => {
-    const {invoices} = useInvoices();
+    const {currentStatusLabel, currentStatus, invoices} = useInvoices();
+    const noInvoicesText = currentStatus === 'any' ? __('You have no invoices', 'app') : sprintf(
+        __('You have no <strong>%s</strong> invoices', 'app'),
+        currentStatusLabel
+    )
 
     return (
         <div className='mt-4 invoices-table-container'>
@@ -34,6 +36,13 @@ const InvoicesList = ({statuses}) => {
                     {invoices && invoices.map((invoice) =>
                         <InvoiceRow statuses={statuses} key={invoice.UUID} {...invoice}/>
                     )}
+                    {invoices?.length === 0 && <>
+                        <tr>
+                            <td colSpan={8}>
+                                <em dangerouslySetInnerHTML={{ __html: noInvoicesText}}/>
+                            </td>
+                        </tr>
+                    </>}
                 </tbody>
             </table>
         </div>

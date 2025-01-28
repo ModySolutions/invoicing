@@ -6,9 +6,15 @@ import CurrencyFormatter from "../components/CurrencyFormatter";
 import DropFileInput from "../components/DropFileInput";
 import {findCountryByIsoCode} from "../tools/Countries";
 import apiFetch from "@wordpress/api-fetch";
+import { useNavigate } from "react-router-dom";
+import {toast} from "react-toastify";
+import {useInvoices} from "../contexts/InvoicesContext";
+import Enums from "../tools/Enums";
 
-const InvoiceForm = () => {
-    const {settings, setSettings, europeCountries} = useSettings();
+const InvoiceForm = (props = null) => {
+    const {ID, UUID} = props;
+    const {settings, setSettings, europeCountries, statuses} = useSettings();
+    const {setInvoices} = useInvoices();
     const [issuedDate, setIssuedDate] = useState(new Date());
     const [dueDate, setDueDate] = useState(new Date());
     const [dateFormat, setDateFormat] = useState('MMM d, Y');
@@ -20,21 +26,22 @@ const InvoiceForm = () => {
         'item_taxable': true,
         'item_total': '0',
     };
-    const [invoiceItems, setInvoiceItems] = useState([defaultItemValues]);
-    const [invoiceSubtotal, setInvoiceSubtotal] = useState(0);
-    const [invoiceTotal, setInvoiceTotal] = useState(0);
-    const [invoiceTaxes, setInvoiceTaxes] = useState(0);
-    const [selectedInvoiceTax, setSelectedInvoiceTax] = useState('');
-    const [invoiceDiscounts, setInvoiceDiscounts] = useState(0);
-    const [selectedInvoiceDiscount, setSelectedInvoiceDiscount] = useState('');
-    const [invoiceNumber, setInvoiceNumber] = useState('');
-    const [invoiceSender, setInvoiceSender] = useState('');
+    const [invoiceItems, setInvoiceItems] = useState(props?.invoice_items ?? [defaultItemValues]);
+    const [invoiceSubtotal, setInvoiceSubtotal] = useState(props?.invoice_items ?? 0);
+    const [invoiceTotal, setInvoiceTotal] = useState(props?.invoice_items ?? 0);
+    const [invoiceTaxes, setInvoiceTaxes] = useState(props?.invoice_tax_subtotal ?? 0);
+    const [selectedInvoiceTax, setSelectedInvoiceTax] = useState(props?.invoice_taxes?.[0]?.invoice_tax_amount ?? '');
+    const [invoiceDiscounts, setInvoiceDiscounts] = useState(props?.invoice_discount_subtotal ?? 0);
+    const [selectedInvoiceDiscount, setSelectedInvoiceDiscount] = useState(props?.invoice_discounts?.[0]?.invoice_discount_amount ??  '0');
+    const [invoiceSender, setInvoiceSender] = useState(props?.invoice_sender ?? '');
     const [formData, setFormData] = useState({
-        invoice_client: '',
-        invoice_notes: '',
-        invoice_terms: '',
+        invoice_client: props?.invoice_client ?? '',
+        invoice_notes: props?.invoice_notes ?? '',
+        invoice_terms: props?.invoice_terms ?? '',
     });
-    const [logo, setLogo] = useState(settings?.invoice_logo ?? '')
+    const [logo, setLogo] = useState(settings?.invoice_logo ?? '');
+    const [invoiceStatus, setInvoiceStatus] = useState(props?.invoice_status ?? Enums.STATUS.DRAFT);
+    const navigate = useNavigate()
 
     useEffect(() => {
         const header = document.querySelector('.header');
@@ -57,9 +64,6 @@ const InvoiceForm = () => {
         if (settings?.selected_invoice_tax > 0) {
             setSelectedInvoiceTax(settings?.selected_invoice_tax)
             setSelectedInvoiceDiscount(settings?.selected_invoice_discount)
-            setInvoiceNumber(prevInvoiceNumber => {
-                return Number(settings?.invoice_last_number) + 1;
-            })
         }
 
         const capitalize = (text) => text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
@@ -86,9 +90,6 @@ const InvoiceForm = () => {
         };
     }, [
         currentPath,
-        setCurrentPath,
-        setSelectedInvoiceTax,
-        setSelectedInvoiceDiscount,
         settings,
         europeCountries
     ]);
@@ -169,6 +170,10 @@ const InvoiceForm = () => {
             setSelectedInvoiceDiscount(value);
         }
 
+        if(select.name === 'invoice_status') {
+            setInvoiceStatus(value)
+        }
+
         handleTaxesAndDiscounts();
     }
 
@@ -194,7 +199,6 @@ const InvoiceForm = () => {
         const data = {
             ...formData,
             ...{
-                'invoice_number': invoiceNumber,
                 'invoice_issue_date': issuedDate,
                 'invoice_due_date': dueDate,
                 'invoice_sender': invoiceSender,
@@ -211,30 +215,47 @@ const InvoiceForm = () => {
                     {
                         'invoice_discount_name': 'I.R.P.F.',
                         'invoice_discount_type': 'percentage',
-                        'invoice_discount_amount': selectedInvoiceDiscount,
+                        'invoice_discount_amount': parseFloat(selectedInvoiceDiscount) ?? 0,
                         'invoice_discount_total': invoiceDiscounts,
                     }
                 ],
                 'invoice_subtotal': invoiceSubtotal,
                 'invoice_total': invoiceTotal,
-                'invoice_tax_value': selectedInvoiceTax,
-                'invoice_discount_value': selectedInvoiceDiscount,
                 'invoice_logo': logo,
                 'invoice_currency': settings?.invoice_currency,
-                'invoice_currency_symbol': settings?.invoice_currency_symbol
+                'invoice_currency_symbol': settings?.invoice_currency_symbol,
+                'invoice_sender_address': invoiceSender,
+                'invoice_client_address': formData?.invoice_client,
+                'invoice_tax_subtotal': invoiceTaxes,
+                'invoice_discount_subtotal': invoiceDiscounts,
             }
         }
 
+        let url = 'wp/v2/invoice';
+        if(ID && UUID) {
+            url = `invoice/v1/invoice/${UUID}`;
+        }
         apiFetch({
-            path: 'wp/v2/invoice',
+            path: url,
             method: 'POST',
-            data: data,
+            data: {
+                'post_status': invoiceStatus,
+                'post_title': props?.UUID ?? `${issuedDate}-${dueDate} - ${__('Draft', 'app')}`,
+                'acf': data,
+            },
         })
         .then((response) => {
-            console.log(response);
+            toast.success(
+                __('Invoice saved successfully.'),
+                {
+                    autoClose: 3000,
+                }
+            )
+            if(!ID && !UUID) {
+                setInvoices((prevInvoices) => [...prevInvoices, ...[response]]);
+                navigate(`/invoices/edit/${response.UUID}`)
+            }
         })
-
-        console.log(data);
     };
 
     return (
@@ -259,20 +280,14 @@ const InvoiceForm = () => {
                                     {__('Invoice', 'app')}
                                 </h1>
                                 <div className='invoice-number flex items-end gap-2 p-relative'>
-                                    <label htmlFor='invoice-number' className={'p-absolute top center p-2 pt-1'}>
-                                        #
-                                    </label>
                                     <input
                                         required
                                         type='text'
-                                        placeholder='#'
+                                        placeholder='#INVOICE NUMBER'
                                         className='text-right'
                                         name='invoice-number'
                                         id='invoice-number'
-                                        value={invoiceNumber}
-                                        onChange={(number) => {
-                                            setInvoiceNumber(number);
-                                        }}
+                                        disabled
                                     />
                                 </div>
                             </div>
@@ -298,6 +313,7 @@ const InvoiceForm = () => {
                                           placeholder={__('Who is this to?', 'app')}
                                           name='invoice_client'
                                           onChange={handleTextChange}
+                                          value={formData?.invoice_client}
                                           id='client'
                                           cols='30'
                                           rows='3'></textarea>
@@ -420,6 +436,7 @@ const InvoiceForm = () => {
                                             )}
                                             onChange={handleTextChange}
                                             name='invoice_notes'
+                                            value={formData?.invoice_notes}
                                             id='notes'
                                             cols='30'
                                             rows='3'></textarea>
@@ -437,6 +454,7 @@ const InvoiceForm = () => {
                                             )}
                                             onChange={handleTextChange}
                                             name='invoice_terms'
+                                            value={formData?.invoice_terms}
                                             id='terms'
                                             cols='30'
                                             rows='3'></textarea>
@@ -512,6 +530,18 @@ const InvoiceForm = () => {
                                 ))}
                             </select>
                         </div>
+                    </div>
+                    <div className='flex flex-column'>
+                        <label htmlFor='invoice_status'>{__('Invoice status', 'app')}</label>
+                        <select name='invoice_status'
+                                id='invoice_status'
+                                value={invoiceStatus}
+                                onChange={handleSelectChange}
+                        >
+                            {statuses && Object.entries(statuses).map(([value, item]) => {
+                                return (<option key={`option_status_${value}`} value={value}>{__(item.name, 'app')}</option>)
+                            })}
+                        </select>
                     </div>
                 </aside>
             </div>

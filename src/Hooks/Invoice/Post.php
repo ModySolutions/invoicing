@@ -6,51 +6,53 @@ use function Env\env;
 
 class Post {
     public static function register_post_type(): void {
+        $labels = array(
+            'name' => __('Invoices'),
+            'singular_name' => __('Invoice'),
+            'menu_name' => __('Invoices'),
+            'all_items' => __('All Invoices'),
+            'edit_item' => __('Edit Invoice'),
+            'view_item' => __('View Invoice'),
+            'view_items' => __('View Invoices'),
+            'add_new_item' => __('Add New Invoice'),
+            'add_new' => __('Add New Invoice'),
+            'new_item' => __('New Invoice'),
+            'parent_item_colon' => __('Parent Invoice:'),
+            'search_items' => __('Search Invoice'),
+            'not_found' => __('No invoices found'),
+            'not_found_in_trash' => __('No invoices found in Trash'),
+            'archives' => __('Invoice Archives'),
+            'attributes' => __('Invoice Attributes'),
+            'insert_into_item' => __('Insert into invoice'),
+            'uploaded_to_this_item' => __('Uploaded to this invoice'),
+            'filter_items_list' => __('Filter invoice list'),
+            'filter_by_date' => __('Filter invoice by date'),
+            'items_list_navigation' => __('Invoice list navigation'),
+            'items_list' => __('Invoice list'),
+            'item_published' => __('Invoice published.'),
+            'item_published_privately' => __('Invoice published privately.'),
+            'item_reverted_to_draft' => __('Invoice reverted to draft.'),
+            'item_scheduled' => __('Invoice scheduled.'),
+            'item_updated' => __('Invoice updated.'),
+            'item_link' => __('Invoice Link'),
+            'item_link_description' => __('A link to a invoice.'),
+        );
+
         register_post_type('invoice', array(
-            'labels' => array(
-                'name' => __('Invoices'),
-                'singular_name' => __('Invoice'),
-                'menu_name' => __('Invoices'),
-                'all_items' => __('All Invoices'),
-                'edit_item' => __('Edit Invoice'),
-                'view_item' => __('View Invoice'),
-                'view_items' => __('View Invoices'),
-                'add_new_item' => __('Add New Invoice'),
-                'add_new' => __('Add New Invoice'),
-                'new_item' => __('New Invoice'),
-                'parent_item_colon' => __('Parent Invoice:'),
-                'search_items' => __('Search Invoice'),
-                'not_found' => __('No invoices found'),
-                'not_found_in_trash' => __('No invoices found in Trash'),
-                'archives' => __('Invoice Archives'),
-                'attributes' => __('Invoice Attributes'),
-                'insert_into_item' => __('Insert into invoice'),
-                'uploaded_to_this_item' => __('Uploaded to this invoice'),
-                'filter_items_list' => __('Filter invoice list'),
-                'filter_by_date' => __('Filter invoice by date'),
-                'items_list_navigation' => __('Invoice list navigation'),
-                'items_list' => __('Invoice list'),
-                'item_published' => __('Invoice published.'),
-                'item_published_privately' => __('Invoice published privately.'),
-                'item_reverted_to_draft' => __('Invoice reverted to draft.'),
-                'item_scheduled' => __('Invoice scheduled.'),
-                'item_updated' => __('Invoice updated.'),
-                'item_link' => __('Invoice Link'),
-                'item_link_description' => __('A link to a invoice.'),
-            ),
+            'labels' => $labels,
             'public' => true,
             'exclude_from_search' => true,
             'show_in_nav_menus' => false,
             'show_in_rest' => true,
             'publicly_queryable' => false,
             'menu_position' => 9,
-            'menu_icon' => 'data:image/svg+xml;base64,'.
-                base64_encode('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#005f6b"><path d="M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>'),
+            'menu_icon' => 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#005f6b"><path d="M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>'),
             'supports' => array(
                 'author',
                 'custom-fields',
+                'title',
             ),
-            'has_archive' => false,
+            'has_archive' => true,
             'delete_with_user' => false,
         ));
     }
@@ -67,14 +69,12 @@ class Post {
         if( $post->post_type == 'invoice' ){
             $options = '';
             $label = '';
-            $button_label = __('Save Invoice');
 
             foreach(self::_get_statuses_array() as $invoice_status => $data) {
                 $complete = '';
                 if( $post->post_status == $invoice_status ){
                     $complete = 'selected=\"selected\"';
                     $label = " {$data['label']}";
-                    $button_label = sprintf(__('Save %s Invoice'), $data['label']);
                 }
                 $options .= "<option value=\"{$invoice_status}\" $complete>{$data['label']}</option>";
             }
@@ -111,12 +111,34 @@ EOF;
                 'ID' => $post_id
             )
         );
-        update_post_meta($post_id, 'app_filter_the_permalink', 1);
+    }
+
+    public static function views_edit(array $views) : array {
+        global $post_type;
+
+        if ($post_type == 'invoice') {
+            $status_count = wp_count_posts('invoice');
+
+            $current = array_key_exists('post_status', $_GET) ?
+                sanitize_text_field($_GET['post_status']) : '';
+            foreach(self::_get_statuses_array() as $status => $data) {
+                $draft_count = $status_count->{$status};
+                $class = $current === $status ? ' class="current"' : '';
+                $views[$status] = '<a href="' . admin_url("edit.php?post_type=invoice&post_status={$status}") .
+                    '"' . $class . '>' . $data['label'] . ' (' . $draft_count . ')</a>';
+            }
+        }
+
+        return $views;
+    }
+
+    public static function acf_validate_invoice_number($valid, $value, $field, $input_name) : bool {
+        return $valid;
     }
 
     private static function _get_statuses_array() : array {
         return array(
-            'invoice-draft' => array(
+            'invoice_draft' => array(
                 'label' => _x('Draft', 'invoice post status'),
                 'public' => true,
                 'show_in_admin_all_list' => true,
@@ -124,7 +146,7 @@ EOF;
                 'date_floating' => true,
                 'label_count' => _n_noop('Draft <span class="count">(%s)</span>', 'Drafts <span class="count">(%s)</span>')
             ),
-            'invoice-issued' => array(
+            'invoice_issued' => array(
                 'label' => _x('Issued', 'invoice post status'),
                 'public' => true,
                 'show_in_admin_all_list' => true,
@@ -132,7 +154,7 @@ EOF;
                 'date_floating' => true,
                 'label_count' => _n_noop('Issued <span class="count">(%s)</span>', 'Issued <span class="count">(%s)</span>')
             ),
-            'invoice-sent' => array(
+            'invoice_sent' => array(
                 'label' => _x('Sent', 'invoice post status'),
                 'public' => true,
                 'show_in_admin_all_list' => true,
@@ -140,7 +162,7 @@ EOF;
                 'date_floating' => true,
                 'label_count' => _n_noop('Sent <span class="count">(%s)</span>', 'Sent <span class="count">(%s)</span>')
             ),
-            'invoice-expired' => array(
+            'invoice_expired' => array(
                 'label' => _x('Expired', 'invoice post status'),
                 'public' => true,
                 'show_in_admin_all_list' => true,
@@ -149,7 +171,7 @@ EOF;
                 'label_count' => _n_noop('Expired <span class="count">(%s)</span>',
                     'Expired <span class="count">(%s)</span>')
             ),
-            'invoice-paid' => array(
+            'invoice_paid' => array(
                 'label' => _x('Paid', 'invoice post status'),
                 'public' => true,
                 'show_in_admin_all_list' => true,
@@ -157,7 +179,7 @@ EOF;
                 'date_floating' => true,
                 'label_count' => _n_noop('Paid <span class="count">(%s)</span>', 'Paid <span class="count">(%s)</span>')
             ),
-            'invoice-cancelled' => array(
+            'invoice_cancelled' => array(
                 'label' => _x('Cancelled', 'invoice post status'),
                 'public' => true,
                 'show_in_admin_all_list' => true,

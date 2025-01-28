@@ -10,6 +10,7 @@ const DropFileInput = props => {
     const [logo, setLogo] = useState(props?.logo);
     const [className, setClassName] = useState('bg-cultured');
     const [uploading, setUploading] = useState(false);
+    const [disabled, setDisabled] = useState(props?.disabled ?? false)
 
     const onDragEnter = () => wrapperRef.current.classList.add('dragover');
     const onDragLeave = () => wrapperRef.current.classList.remove('dragover');
@@ -89,11 +90,11 @@ const DropFileInput = props => {
                         )}
                     </div>
                 </div>
-                <input type='file'
+                {logo && !disabled && <input type='file'
                        value=''
                        className='w-150 h-100 p-absolute top center'
                        style={{'opacity': '0'}}
-                       onChange={onFileDrop}/>
+                       onChange={onFileDrop}/>}
             </div>
         </>
     );

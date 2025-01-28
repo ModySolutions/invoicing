@@ -17,12 +17,12 @@ const InvoiceRow = ({
                         statuses
                     }) => {
     let navigate = useNavigate();
-    const [showEdit] = useState(invoice_status === 'invoice-draft');
-    const [showView] = useState(invoice_status !== 'invoice-draft');
+    const [showEdit] = useState(invoice_status === 'invoice_draft');
+    const [showView] = useState(invoice_status !== 'invoice_draft');
     const [clientName, setClientName] = useState(invoice_client);
 
     useEffect(() => {
-        const fullName = invoice_client.split('\n');
+        const fullName = invoice_client ? invoice_client.split('\n') : [__('unknown', 'app')];
         if (fullName[0]) {
             setClientName(fullName[0])
         }
@@ -72,10 +72,10 @@ const InvoiceRow = ({
         )
     }
 
-    return <tr key={uuidv4()}>
+    return <tr key={`invoice-row-${generated_invoice_number}`}>
         <td data-title={__('Number', 'app')}>
             <strong>
-                {generated_invoice_number}
+                {generated_invoice_number ?? ''}
             </strong>
         </td>
         <td data-title={__('Client', 'app')}>

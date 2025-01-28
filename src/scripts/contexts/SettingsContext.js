@@ -14,6 +14,7 @@ export const SettingsProvider = ({children}) => {
     const [error, setError] = useState(null);
     const [europeCountries, setEuropeCountries] = useState([]);
     const [currentPath, setCurrentPath] = useState(window.location.pathname);
+    const [statuses, setStatuses] = useState({});
 
     useEffect(() => {
         const allCountries = Country.getAllCountries();
@@ -46,8 +47,18 @@ export const SettingsProvider = ({children}) => {
         });
     }, []);
 
+    useEffect(() => {
+        apiFetch({path: '/wp/v2/statuses'})
+        .then(response => {
+            const invoiceStatuses = Object.fromEntries(
+                Object.entries(response).filter(([key]) => key.includes('invoice'))
+            ) ?? [];
+            setStatuses(invoiceStatuses);
+        })
+    }, []);
+
     return (
-        <SettingsContext.Provider value={{settings, setSettings, europeCountries, currentPath, setCurrentPath, loading, error}}>
+        <SettingsContext.Provider value={{settings, setSettings, europeCountries, currentPath, setCurrentPath, loading, error, statuses}}>
             {children}
         </SettingsContext.Provider>
     );

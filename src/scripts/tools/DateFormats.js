@@ -1,13 +1,13 @@
-const date = new Date();
-const formatDate = (format) => {
+export const formatDate = (format, date) => {
+    date = date ?? new Date();
     let options = {};
-
+    console.log(format)
     switch (format) {
         case 'MMM d, Y':
             options = { year: 'numeric', month: 'short', day: 'numeric' };
             break;
-        case 'd/m/Y':
-            options = { day: 'numeric', month: 'numeric', year: 'numeric' };
+        case 'd/M/Y':
+            options = { day: '2-digit', month: '2-digit', year: '2-digit' };
             break;
         default:
             options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -22,7 +22,7 @@ export default [
         'label': formatDate('MMM d, Y')
     },
     {
-        'value': 'd/m/Y',
-        'label': formatDate('d/m/Y')
+        'value': 'd/M/Y',
+        'label': formatDate('d/M/Y')
     },
 ];
