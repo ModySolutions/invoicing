@@ -90,7 +90,7 @@ const DropFileInput = props => {
                         )}
                     </div>
                 </div>
-                {logo && !disabled && <input type='file'
+                {logo && <input type='file'
                        value=''
                        className='w-150 h-100 p-absolute top center'
                        style={{'opacity': '0'}}
