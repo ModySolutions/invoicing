@@ -4,7 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 import Links from "../components/Links";
 import {Country} from "country-state-city";
 import EuropeCountries from "@invoice/tools/EuropeCountries";
-import {navigate} from "@modycloud/tools/navigate";
+import {navigate} from "@invoice/tools/navigate";
 
 const SettingsContext = createContext(null);
 

@@ -1,4 +1,3 @@
-import {v4 as uuidv4} from "uuid";
 import {__} from '@wordpress/i18n';
 import {useState, useEffect} from 'react';
 import {useNavigate} from "react-router-dom";

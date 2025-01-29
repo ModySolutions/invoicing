@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {State} from 'country-state-city';
 import apiFetch from '@wordpress/api-fetch';
 import {toast} from "react-toastify";
-import toKebabCase from "@modycloud/tools/kebabcase";
+import toKebabCase from "@invoice/tools/kebabcase";
 
 const Business = () => {
     const {settings, setSettings, europeCountries, loading, error} = useSettings();

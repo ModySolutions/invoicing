@@ -1,6 +1,6 @@
 import { __ } from "@wordpress/i18n";
 import {useState} from "react";
-import {navigate} from "@modycloud/tools/navigate";
+import {navigate} from "@invoice/tools/navigate";
 
 const Links = ({ routes, locationPathname = '/invoices/' }) => {
     if (!routes || Object.keys(routes).length === 0) {
