@@ -90,11 +90,11 @@ const DropFileInput = props => {
                         )}
                     </div>
                 </div>
-                {logo && <input type='file'
+                <input type='file'
                        value=''
                        className='w-150 h-100 p-absolute top center'
                        style={{'opacity': '0'}}
-                       onChange={onFileDrop}/>}
+                       onChange={onFileDrop}/>
             </div>
         </>
     );
