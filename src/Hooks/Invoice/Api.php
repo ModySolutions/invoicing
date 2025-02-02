@@ -49,7 +49,7 @@ class Api {
         return rest_ensure_response(array(
             'invoice_last_number' => get_option('invoice_last_number', 0),
             'invoice_series' => get_option('invoice_series', array()),
-            'invoice_date_format' => get_option('invoice_date_format', get_option('date_format')),
+            'invoice_date_format' => get_option('invoice_date_format', 'd/M/Y'),
             'invoice_business_fni_country_code' => get_option('invoice_business_fni_country_code', 'ES'),
             'invoice_business_fni' => get_option('invoice_business_fni', ''),
             'invoice_business_name' => get_option('invoice_business_name', get_bloginfo()),
