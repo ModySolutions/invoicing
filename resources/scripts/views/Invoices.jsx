@@ -4,17 +4,7 @@ import InvoiceStatuses from "@invoice/components/InvoiceStatuses";
 import InvoicesList from "@invoice/components/InvoicesList";
 
 const Invoices = () => {
-    const [statuses, setStatuses] = useState({});
-
-    useEffect(() => {
-        apiFetch({path: '/wp/v2/statuses'})
-            .then(response => {
-                const invoiceStatuses = Object.fromEntries(
-                    Object.entries(response).filter(([key]) => key.includes('invoice'))
-                ) ?? [];
-                setStatuses(invoiceStatuses);
-            })
-    }, [setStatuses]);
+    const [statuses] = useState(Invoice.statuses);
 
     return (
         <>

@@ -239,7 +239,7 @@ const InvoiceForm = (props = null) => {
             path: url,
             method: 'POST',
             data: {
-                'post_status': invoiceStatus,
+                'post_status': invoiceStatus ?? Enums.STATUS.DRAFT,
                 'post_title': props?.UUID ?? `${issuedDate}-${dueDate} - ${__('Draft', 'app')}`,
                 'acf': data,
             },
@@ -253,7 +253,7 @@ const InvoiceForm = (props = null) => {
             )
             if(!ID && !UUID) {
                 setInvoices((prevInvoices) => [...prevInvoices, ...[response]]);
-                navigate(`/invoices/edit/${response.UUID}`)
+                navigate(`/invoices/view/${response.UUID}`)
             }
         })
     };
@@ -539,7 +539,7 @@ const InvoiceForm = (props = null) => {
                                 onChange={handleSelectChange}
                         >
                             {statuses && Object.entries(statuses).map(([value, item]) => {
-                                return (<option key={`option_status_${value}`} value={value}>{__(item.name, 'app')}</option>)
+                                return (<option key={`option_status_${value}`} value={value}>{__(item.label, 'app')}</option>)
                             })}
                         </select>
                     </div>

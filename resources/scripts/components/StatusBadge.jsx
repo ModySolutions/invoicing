@@ -1,7 +1,7 @@
 const StatusBadge = ({status}) => {
     return (
         <span className={`btn btn-xs ${status?.classNames?.join(' ')}`}>
-            {status?.name}
+            {status?.label}
         </span>
     )
 }

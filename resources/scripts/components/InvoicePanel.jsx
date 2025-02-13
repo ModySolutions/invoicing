@@ -31,7 +31,7 @@ const InvoicePanel = (props = null) => {
         invoice_notes: props?.invoice_notes ?? '',
         invoice_terms: props?.invoice_terms ?? '',
     });
-    const [logo, setLogo] = useState(settings?.invoice_logo ?? '');
+    const [logo, setLogo] = useState(props?.invoice_logo ?? settings?.invoice_logo);
     const [invoiceStatus, setInvoiceStatus] = useState(props?.invoice_status);
     const [invoiceCurrentStatus, setInvoiceCurrentStatus] = useState(props?.invoice_status);
     const [allowedStatuses, setAllowedStatuses] = useState(statuses);
@@ -74,7 +74,7 @@ const InvoicePanel = (props = null) => {
                 }
 
                 if (statusReached) {
-                    allowed.push({value: status, label: data.name});
+                    allowed.push({value: status, label: data.label});
                 }
             })
             setAllowedStatuses(allowed);
@@ -95,6 +95,7 @@ const InvoicePanel = (props = null) => {
         europeCountries,
         invoiceStatus,
         statuses,
+        props
     ]);
 
     const handleSubmit = (event) => {

@@ -83,7 +83,7 @@ const DropFileInput = props => {
                         {logo ? (
                             <div>
                                 <a href='#' onClick={fileRemove} className='close p-absolute top right'>&times;</a>
-                                <img alt={__('Invoice logo', 'app')} src={logo} className='w-100-p h-auto object-cover'/>
+                                <img alt={__('Invoice logo', 'app')} src={logo.toString()} className='w-100-p h-auto object-cover'/>
                             </div>
                         ) : (
                             __('Add your logo', 'app')

@@ -58,7 +58,7 @@ class Post {
     }
 
     public static function register_post_status(): void {
-        foreach(self::_get_statuses_array() as $invoice_status => $data) {
+        foreach(self::get_statuses_array() as $invoice_status => $data) {
             register_post_status($invoice_status, $data);
         }
     }
@@ -70,7 +70,7 @@ class Post {
             $options = '';
             $label = '';
 
-            foreach(self::_get_statuses_array() as $invoice_status => $data) {
+            foreach(self::get_statuses_array() as $invoice_status => $data) {
                 $complete = '';
                 if( $post->post_status == $invoice_status ){
                     $complete = 'selected=\"selected\"';
@@ -121,7 +121,7 @@ EOF;
 
             $current = array_key_exists('post_status', $_GET) ?
                 sanitize_text_field($_GET['post_status']) : '';
-            foreach(self::_get_statuses_array() as $status => $data) {
+            foreach(self::get_statuses_array() as $status => $data) {
                 $draft_count = $status_count->{$status};
                 $class = $current === $status ? ' class="current"' : '';
                 $views[$status] = '<a href="' . admin_url("edit.php?post_type=invoice&post_status={$status}") .
@@ -136,9 +136,9 @@ EOF;
         return $valid;
     }
 
-    private static function _get_statuses_array() : array {
+    public static function get_statuses_array() : array {
         return array(
-            'invoice_draft' => array(
+            'draft' => array(
                 'label' => _x('Draft', 'invoice post status'),
                 'public' => true,
                 'show_in_admin_all_list' => true,

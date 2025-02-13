@@ -1,5 +1,6 @@
 import {__} from '@wordpress/i18n';
 import {useInvoices} from "../contexts/InvoicesContext";
+import Enums from "../tools/Enums";
 
 const StatusButton = ({textClassName, bgClassName, status, label, onClick, active}) => {
     return (
@@ -27,8 +28,8 @@ const InvoiceStatuses = ({statuses}) => {
                 status='any'
                 label={__('Any')}/>
 
-            {Object.entries(statuses).map(([status, data]) => {
-                const [textClassName, bgClassName] = data?.classNames;
+            {statuses && Object.entries(statuses).map(([status, data]) => {
+                const [textClassName, bgClassName] = Enums.STATUS.COLORS[status];
                 return <StatusButton
                     textClassName={textClassName}
                     bgClassName={bgClassName}
@@ -38,7 +39,7 @@ const InvoiceStatuses = ({statuses}) => {
                         setCurrentStatusLabel(data?.name)
                     }}
                     active={currentStatus === status}
-                    label={data?.name}
+                    label={data?.label}
                     key={`invoice-status-filter-btn-${status}`}
                 />
             })}

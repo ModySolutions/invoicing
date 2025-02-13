@@ -9,12 +9,14 @@ import {navigate} from "@invoice/tools/navigate";
 const SettingsContext = createContext(null);
 
 export const SettingsProvider = ({children}) => {
-    const [settings, setSettings] = useState(null);
+    const [settings, setSettings] = useState(Invoice.settings);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [europeCountries, setEuropeCountries] = useState([]);
     const [currentPath, setCurrentPath] = useState(window.location.pathname);
-    const [statuses, setStatuses] = useState({});
+    const [statuses] = useState(Object.fromEntries(
+        Object.entries(Invoice.statuses).filter(([key]) => key.includes('invoice') || key === 'draft')
+    ) ?? []);
 
     useEffect(() => {
         const allCountries = Country.getAllCountries();
@@ -39,26 +41,20 @@ export const SettingsProvider = ({children}) => {
         .catch(error => {
             console.log(error)
         });
-
-        apiFetch({path: `/invoice/v1/settings`})
-        .then(responseSettings => {
-            setSettings(responseSettings)
-            setLoading(false)
-        });
-    }, []);
-
-    useEffect(() => {
-        apiFetch({path: '/wp/v2/statuses'})
-        .then(response => {
-            const invoiceStatuses = Object.fromEntries(
-                Object.entries(response).filter(([key]) => key.includes('invoice'))
-            ) ?? [];
-            setStatuses(invoiceStatuses);
-        })
+        setLoading(false)
     }, []);
 
     return (
-        <SettingsContext.Provider value={{settings, setSettings, europeCountries, currentPath, setCurrentPath, loading, error, statuses}}>
+        <SettingsContext.Provider value={{
+            settings,
+            setSettings,
+            europeCountries,
+            currentPath,
+            setCurrentPath,
+            loading,
+            error,
+            statuses
+        }}>
             {children}
         </SettingsContext.Provider>
     );

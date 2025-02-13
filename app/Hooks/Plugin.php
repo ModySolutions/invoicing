@@ -2,6 +2,9 @@
 
 namespace Invoice\Hooks;
 
+use Invoice\Hooks\Invoice\Post;
+use Invoice\Hooks\Invoice\Settings;
+
 class Plugin {
     const last_update = 'Rare|Backache|Length|Petrichor';
     public static function init() : void {
@@ -105,8 +108,10 @@ class Plugin {
                'app-invoice',
                'Invoice',
                array(
+                   'settings' => Settings::get_settings(),
                    'invoice_page_id' => get_option('invoice_page_id'),
-               )
+                   'statuses' => Post::get_statuses_array(),
+               ),
            );
            wp_enqueue_script('app-invoice');
 
