@@ -8,6 +8,6 @@
   "acf": {
     "mode": "edit",
     "post_types": ["page"],
-    "renderTemplate": "../../../invoice-template.php"
+    "renderTemplate": "./invoice-template.php"
   }
 }

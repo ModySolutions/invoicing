@@ -1,7 +1,6 @@
 export const formatDate = (format, date) => {
     date = date ?? new Date();
     let options = {};
-    console.log(format)
     switch (format) {
         case 'MMM d, Y':
             options = { year: 'numeric', month: 'short', day: 'numeric' };

@@ -7,7 +7,7 @@ use Invoice\Hooks\Invoice\Meta;
 use Invoice\Hooks\Invoice\Post;
 use Invoice\Hooks\Invoice\Routes;
 
-class InvoiceHook {
+class Invoice {
     public static function init() : void {
         add_action('init' , Post::register_post_type(...));
         add_action('init' , Post::register_post_status(...));

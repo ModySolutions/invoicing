@@ -1,6 +1,6 @@
 <?php
 
-namespace Invoice\Setup;
+namespace Invoice\Hooks;
 
 class Plugin {
     const last_update = 'Rare|Backache|Length|Petrichor';

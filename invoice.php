@@ -22,10 +22,8 @@ define('APP_INVOICE_BLOCK_CONTENT', '<!-- wp:app/invoice {"name":"app/invoice","
 require_once __DIR__ . '/vendor/autoload.php';
 class Invoice
 {
-    const INVOICE_SRC_PATH = __DIR__;
     public static function start() : void {
-        self::loader(self::INVOICE_SRC_PATH . '/src/Setup/*.php', 'Invoice\\Setup\\');
-        self::loader(self::INVOICE_SRC_PATH . '/src/Hooks/*.php', 'Invoice\\Hooks\\');
+        self::loader(APP_INVOICE_DIR . '/app/Hooks/*.php', 'Invoice\\Hooks\\');
     }
 
     public static function loader(string $path, string $namespace = 'Invoice\\') : void {
@@ -40,9 +38,3 @@ class Invoice
 }
 
 Invoice::start();
-
-if(!function_exists('app_invoice_render')) {
-    function app_invoice_render() : void {
-        echo '<div id="app-invoice-container"></div>';
-    }
-}

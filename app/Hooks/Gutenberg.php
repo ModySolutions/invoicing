@@ -1,6 +1,6 @@
 <?php
 
-namespace Invoice\Setup;
+namespace Invoice\Hooks;
 
 class Gutenberg {
 	public static function init() : void {

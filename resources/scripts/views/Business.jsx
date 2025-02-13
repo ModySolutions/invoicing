@@ -17,7 +17,7 @@ const Business = () => {
     const [selectedState, setSelectedState] = useState('');
 
     useEffect(() => {
-        if (!formData?.invoice_business_fni && null !== settings) {
+        if (!formData && null !== settings) {
             setFormData(settings);
             setSelectedCountryCode(settings?.invoice_business_fni_country_code);
             setSelectedCountry(settings?.invoice_business_country);

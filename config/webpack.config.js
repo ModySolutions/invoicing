@@ -4,7 +4,7 @@ const defaults = require('@wordpress/scripts/config/webpack.config.js');
 module.exports = {
     ...defaults,
     entry: {
-        'invoice': path.resolve(process.cwd(), 'src/scripts', 'invoice.js'),
+        'invoice': path.resolve(process.cwd(), 'resources/scripts', 'invoice.js'),
     },
     output: {
         filename: '[name].js',
@@ -16,9 +16,9 @@ module.exports = {
             alias: {
                 ...defaults?.resolve?.alias ?? {},
                 ...{
-                    '@invoice': path.resolve(process.cwd(), 'src/scripts'),
-                    '@inscss': path.resolve(process.cwd(), 'src/scss'),
-                    '@modycloud': [path.resolve(process.cwd(), '../../../../src/scripts')]
+                    '@invoice': path.resolve(process.cwd(), 'resources/scripts'),
+                    '@inscss': path.resolve(process.cwd(), 'resources/scss'),
+                    '@modycloud': [path.resolve(process.cwd(), '../../../../resources/scripts')]
                 }
             }
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Invoice\Setup;
+namespace Invoice\Hooks;
 
 class Blocks {
 	public static function init() : void {
