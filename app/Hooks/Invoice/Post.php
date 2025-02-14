@@ -46,7 +46,8 @@ class Post {
             'show_in_rest' => true,
             'publicly_queryable' => false,
             'menu_position' => 9,
-            'menu_icon' => 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#005f6b"><path d="M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>'),
+            'menu_icon' => 'data:image/svg+xml;base64,'.
+                base64_encode('<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#005f6b"><path d="M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>'),
             'supports' => array(
                 'author',
                 'custom-fields',
@@ -58,21 +59,21 @@ class Post {
     }
 
     public static function register_post_status(): void {
-        foreach(self::get_statuses_array() as $invoice_status => $data) {
+        foreach (self::get_statuses_array() as $invoice_status => $data) {
             register_post_status($invoice_status, $data);
         }
     }
 
-    public static function post_submitbox_misc_actions() : void {
+    public static function post_submitbox_misc_actions(): void {
         global $post;
 
-        if( $post->post_type == 'invoice' ){
+        if ($post->post_type == 'invoice') {
             $options = '';
             $label = '';
 
-            foreach(self::get_statuses_array() as $invoice_status => $data) {
+            foreach (self::get_statuses_array() as $invoice_status => $data) {
                 $complete = '';
-                if( $post->post_status == $invoice_status ){
+                if ($post->post_status == $invoice_status) {
                     $complete = 'selected=\"selected\"';
                     $label = " {$data['label']}";
                 }
@@ -96,47 +97,85 @@ EOF;
         }
     }
 
-    public static function save_post_invoice(int $post_id, \WP_Post $post, bool $update) : void {
+    public static function save_post_invoice(int $post_id, \WP_Post $post, bool $update): void {
         global $wpdb;
         $uuid = get_post_meta($post_id, 'uuid', true);
         $invoice_number = get_field('invoice_number', $post_id);
-        $wpdb->update(
-            $wpdb->posts,
-            array(
+        $wpdb->update($wpdb->posts, array(
                 'post_title' => "{$uuid}-{$invoice_number}",
                 'post_content' => APP_INVOICE_BLOCK_CONTENT,
                 'post_name' => get_post_meta($post_id, 'uuid', true),
-            ),
-            array(
+            ), array(
                 'ID' => $post_id
-            )
-        );
+            ));
+
+        if (get_post_status($post_id) === 'invoice_issued') {
+            $invoice_last_number = (int)get_field('invoice_last_number', 'option');
+            $invoice_new_number = $invoice_last_number + 1;
+            $is_number_in_use = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT post_id from {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %d",
+                    'invoice_number',
+                    $invoice_new_number
+                )
+            );
+
+            if($is_number_in_use?->post_id) {
+
+            }
+        }
     }
 
-    public static function views_edit(array $views) : array {
+    public static function _is_number_in_use(int $number) : bool {
+        global $wpdb;
+        $number_exists = true;
+        while($number_exists) {
+            $is_number_in_use = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT post_id from {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %d",
+                    'invoice_number',
+                    $number
+                )
+            );
+            if($is_number_in_use?->post_id) {
+                $number++;
+            } else {
+                $number_exists = false;
+            }
+        }
+        return $number_exists;
+    }
+
+    public static function views_edit(array $views): array {
         global $post_type;
 
         if ($post_type == 'invoice') {
             $status_count = wp_count_posts('invoice');
 
-            $current = array_key_exists('post_status', $_GET) ?
-                sanitize_text_field($_GET['post_status']) : '';
-            foreach(self::get_statuses_array() as $status => $data) {
+            $current = array_key_exists('post_status', $_GET) ? sanitize_text_field($_GET['post_status']) : '';
+            foreach (self::get_statuses_array() as $status => $data) {
                 $draft_count = $status_count->{$status};
                 $class = $current === $status ? ' class="current"' : '';
-                $views[$status] = '<a href="' . admin_url("edit.php?post_type=invoice&post_status={$status}") .
-                    '"' . $class . '>' . $data['label'] . ' (' . $draft_count . ')</a>';
+                $views[$status] = '<a href="'.
+                    admin_url("edit.php?post_type=invoice&post_status={$status}").
+                    '"'.
+                    $class.
+                    '>'.
+                    $data['label'].
+                    ' ('.
+                    $draft_count.
+                    ')</a>';
             }
         }
 
         return $views;
     }
 
-    public static function acf_validate_invoice_number($valid, $value, $field, $input_name) : bool {
+    public static function acf_validate_invoice_number($valid, $value, $field, $input_name): bool {
         return $valid;
     }
 
-    public static function get_statuses_array() : array {
+    public static function get_statuses_array(): array {
         return array(
             'draft' => array(
                 'label' => _x('Draft', 'invoice post status'),
@@ -144,7 +183,8 @@ EOF;
                 'show_in_admin_all_list' => true,
                 'show_in_admin_status_list' => true,
                 'date_floating' => true,
-                'label_count' => _n_noop('Draft <span class="count">(%s)</span>', 'Drafts <span class="count">(%s)</span>')
+                'label_count' => _n_noop('Draft <span class="count">(%s)</span>',
+                    'Drafts <span class="count">(%s)</span>')
             ),
             'invoice_issued' => array(
                 'label' => _x('Issued', 'invoice post status'),
@@ -152,7 +192,8 @@ EOF;
                 'show_in_admin_all_list' => true,
                 'show_in_admin_status_list' => true,
                 'date_floating' => true,
-                'label_count' => _n_noop('Issued <span class="count">(%s)</span>', 'Issued <span class="count">(%s)</span>')
+                'label_count' => _n_noop('Issued <span class="count">(%s)</span>',
+                    'Issued <span class="count">(%s)</span>')
             ),
             'invoice_sent' => array(
                 'label' => _x('Sent', 'invoice post status'),

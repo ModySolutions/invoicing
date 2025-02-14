@@ -90,7 +90,7 @@ const InvoiceRow = ({
             </strong>
         </td>
         <td data-title={__('Status', 'app')}>
-            <StatusBadge status={statuses[invoice_status]} />
+            <StatusBadge status={invoice_status} />
         </td>
         <td data-title={__('Method', 'app')}>--</td>
         <td className='text-center' data-title={__('Actions', 'app')}>

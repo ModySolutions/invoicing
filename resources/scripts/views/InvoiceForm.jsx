@@ -12,7 +12,7 @@ import {useInvoices} from "../contexts/InvoicesContext";
 import Enums from "../tools/Enums";
 
 const InvoiceForm = (props = null) => {
-    const {ID, UUID} = props;
+    let {ID, UUID} = props;
     const {settings, setSettings, europeCountries, statuses} = useSettings();
     const {setInvoices} = useInvoices();
     const [issuedDate, setIssuedDate] = useState(new Date());
@@ -253,8 +253,9 @@ const InvoiceForm = (props = null) => {
             )
             if(!ID && !UUID) {
                 setInvoices((prevInvoices) => [...prevInvoices, ...[response]]);
-                navigate(`/invoices/view/${response.UUID}`)
+                UUID = response.UUID;
             }
+            navigate(`/invoices/view/${UUID}`)
         })
     };
 

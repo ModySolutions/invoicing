@@ -9,6 +9,7 @@ import {toast} from "react-toastify";
 import {useInvoices} from "../contexts/InvoicesContext";
 import Enums from "../tools/Enums";
 import {formatDate} from "../tools/DateFormats";
+import StatusBadge from "./StatusBadge";
 
 const InvoicePanel = (props = null) => {
     const {ID, UUID} = props;
@@ -116,8 +117,9 @@ const InvoicePanel = (props = null) => {
             )
             if (!ID && !UUID) {
                 setInvoices((prevInvoices) => [...prevInvoices, ...[response]]);
-                navigate(`/invoices/edit/${response.UUID}`)
             }
+            console.log('Holis, ', response)
+            navigate(`/invoices/view/${response.UUID}`)
         })
     };
 
@@ -224,41 +226,21 @@ const InvoicePanel = (props = null) => {
                             <div className='left'>
                                 <div className='notes-container container'>
                                     <div className='form-group col-8'>
-                                        <label htmlFor='notes'>
-                                            {__('Notes', 'app')}
-                                        </label>
-                                        <textarea
-                                            className={'input-lg no-resize'}
-                                            placeholder={__(
-                                                'Notes - any relevant information not already covered',
-                                                'app'
-                                            )}
-                                            onChange={() => {
-                                            }}
-                                            name='invoice_notes'
-                                            value={formData?.invoice_notes}
-                                            id='notes'
-                                            cols='30'
-                                            rows='3'></textarea>
+                                        {formData?.invoice_notes &&
+                                            <label htmlFor='notes'>
+                                                {__('Notes', 'app')}
+                                            </label>
+                                        }
+                                        <div dangerouslySetInnerHTML={{__html: formData?.invoice_notes}}></div>
                                     </div>
                                     <div className='col-4'></div>
                                     <div className='form-group col-8'>
-                                        <label htmlFor='terms'>
-                                            {__('Terms', 'app')}
-                                        </label>
-                                        <textarea
-                                            className={'input-lg no-resize'}
-                                            placeholder={__(
-                                                'Terms and conditions - late fees, payment methods, delivery schedule',
-                                                'app'
-                                            )}
-                                            onChange={() => {
-                                            }}
-                                            name='invoice_terms'
-                                            value={formData?.invoice_terms}
-                                            id='terms'
-                                            cols='30'
-                                            rows='3'></textarea>
+                                        {formData?.invoice_terms &&
+                                            <label htmlFor='terms'>
+                                                {__('Terms', 'app')}
+                                            </label>
+                                        }
+                                        <div dangerouslySetInnerHTML={{__html: formData?.invoice_terms}}></div>
                                     </div>
                                 </div>
                             </div>
@@ -302,27 +284,51 @@ const InvoicePanel = (props = null) => {
                     </div>
                 </div>
                 <aside className='sidebar pl-4 pr-4 pt-0 flex flex-column gap-4'>
-                    <button type='submit' className='btn btn-wide mt-2'>
-                        {__('Save Invoice', 'app')}
-                    </button>
-                    <hr className='b-bottom-grey-10-4 mx-4'/>
+                    {invoiceStatus === 'draft' &&
+                        <>
+                            <a href={`#`}
+                               onClick={(event) => {
+                                   event.preventDefault();
+                                   navigate(`/invoices/edit/${props?.UUID}/`)
+                               }} className='btn btn-wide mt-2'>
+                                {__('Edit Invoice', 'app')}
+                            </a>
+                            <hr className='b-bottom-grey-10-4 mx-4'/>
+                        </>
+                    }
                     <div className='flex flex-column'>
-                        <label htmlFor='invoice_status'>{__('Invoice status', 'app')}</label>
-                        <select name='invoice_status'
-                                id='invoice_status'
-                                value={invoiceStatus}
-                                onChange={(elem) => setInvoiceStatus(elem.target.value)}
-                        >
-                            {allowedStatuses.length && allowedStatuses.map((item) => {
-                                return (
-                                    <option key={`option_status_${item.value}`}
-                                            value={item.value}
-                                            disabled={invoiceStatus === item.value}>
-                                        {__(item.label, 'app')}
-                                    </option>
-                                )
-                            })}
-                        </select>
+                        {invoiceStatus ===
+                            'draft' &&
+                            <label htmlFor='invoice_status'>{__('Invoice status', 'app')}</label>}
+                        <StatusBadge status={invoiceStatus}/>
+                        <div className='flex flex-row gap-3'>
+                            <button className='btn btn-white text-charcoal mt-4'>
+                                <svg xmlns='http://www.w3.org/2000/svg'
+                                     height='24px'
+                                     viewBox='0 -960 960 960'
+                                     width='24px'
+                                     style={{fill: '#666666'}}
+                                     fill='#666666'>
+                                    <path d='M640-640v-120H320v120h-80v-200h480v200h-80Zm-480 80h640-640Zm560 100q17 0 28.5-11.5T760-500q0-17-11.5-28.5T720-540q-17 0-28.5 11.5T680-500q0 17 11.5 28.5T720-460Zm-80 260v-160H320v160h320Zm80 80H240v-160H80v-240q0-51 35-85.5t85-34.5h560q51 0 85.5 34.5T880-520v240H720v160Zm80-240v-160q0-17-11.5-28.5T760-560H200q-17 0-28.5 11.5T160-520v160h80v-80h480v80h80Z'/>
+                                </svg>
+                                <span className='text-charcoal'>
+                                    {__('Print', 'app')}
+                                </span>
+                            </button>
+                            <button className='btn btn-danger-light text-charcoal mt-4'>
+                                <svg xmlns='http://www.w3.org/2000/svg'
+                                     height='24px'
+                                     viewBox='0 -960 960 960'
+                                     width='24px'
+                                     style={{fill: '#992424'}}
+                                     fill='#666666'>
+                                    <path d='M360-460h40v-80h40q17 0 28.5-11.5T480-580v-40q0-17-11.5-28.5T440-660h-80v200Zm40-120v-40h40v40h-40Zm120 120h80q17 0 28.5-11.5T640-500v-120q0-17-11.5-28.5T600-660h-80v200Zm40-40v-120h40v120h-40Zm120 40h40v-80h40v-40h-40v-40h40v-40h-80v200ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z'/>
+                                </svg>
+                                <span className='text-danger-dark'>
+                                    {__('PDF', 'app')}
+                                </span>
+                            </button>
+                        </div>
                     </div>
                 </aside>
             </div>
