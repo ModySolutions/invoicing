@@ -59,7 +59,7 @@ const Settings = () => {
                 if(success) {
                     setSettings(prevState => ({
                         ...prevState,
-                        ...formData
+                        ...newState
                     }));
                     toast.success(
                         message || __('Invoice settings updated successfully.'),
