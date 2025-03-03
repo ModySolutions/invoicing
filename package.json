@@ -29,6 +29,7 @@
     "country-state-city": "^3.2.1",
     "css-loader": "^7.1.2",
     "prop-types": "^15.8.1",
+    "qrcode.react": "^4.2.0",
     "react-datepicker": "^7.6.0",
     "react-input-mask": "^2.0.4",
     "react-router-dom": "^7.1.1",

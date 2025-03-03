@@ -5,6 +5,7 @@ module.exports = {
     ...defaults,
     entry: {
         'invoice': path.resolve(process.cwd(), 'resources/scripts', 'invoice.js'),
+        'print': path.resolve(process.cwd(), 'resources/scripts', 'print.js'),
     },
     output: {
         filename: '[name].js',

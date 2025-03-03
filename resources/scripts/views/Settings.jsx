@@ -19,7 +19,7 @@ const Settings = () => {
             setLastInvoiceNumber(formData?.invoice_last_number ?? settings?.invoice_last_number);
             setSelectedDateFormat(formData?.invoice_date_format ?? settings?.invoice_date_format);
         }
-    }, [formData, setFormData, settings])
+    }, [formData, settings])
 
     const handleInputChange = (event) => {
         const {name, value} = event.target;
@@ -55,11 +55,11 @@ const Settings = () => {
             },
         })
             .then((response) => {
-                const { success, message, newState } = response
+                const { success, message, data } = response
                 if(success) {
                     setSettings(prevState => ({
                         ...prevState,
-                        ...newState
+                        ...data
                     }));
                     toast.success(
                         message || __('Invoice settings updated successfully.'),

@@ -7,59 +7,41 @@ import apiFetch from "@wordpress/api-fetch";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
 import {useInvoices} from "../contexts/InvoicesContext";
-import Enums from "../tools/Enums";
 import {formatDate} from "../tools/DateFormats";
 import StatusBadge from "./StatusBadge";
+import {QRCodeSVG} from "qrcode.react";
+import setInvoiceHeader from "../tools/setInvoiceHeader";
 
 const InvoicePanel = (props = null) => {
     const {ID, UUID} = props;
-    const {settings, setSettings, europeCountries, statuses} = useSettings();
+    const {settings, europeCountries, statuses} = useSettings();
     const {setInvoices} = useInvoices();
-    const [issuedDate, setIssuedDate] = useState(props?.invoice_issue_date ?? new Date());
-    const [dueDate, setDueDate] = useState(props?.invoice_due_date ?? new Date());
+    const [issuedDate] = useState(props?.invoice_issue_date ?? new Date());
+    const [dueDate] = useState(props?.invoice_due_date ?? new Date());
     const [dateFormat, setDateFormat] = useState(settings?.invoice_date_format);
     const {currentPath, setCurrentPath} = useSettings();
     const [invoiceItems, setInvoiceItems] = useState(props?.invoice_items);
-    const [invoiceSubtotal, setInvoiceSubtotal] = useState(props?.invoice_items);
-    const [invoiceTotal, setInvoiceTotal] = useState(props?.invoice_items);
-    const [invoiceTaxes, setInvoiceTaxes] = useState(props?.invoice_tax_subtotal);
-    const [selectedInvoiceTax, setSelectedInvoiceTax] = useState(props?.invoice_taxes?.[0]?.invoice_tax_amount);
-    const [invoiceDiscounts, setInvoiceDiscounts] = useState(props?.invoice_discount_subtotal);
-    const [selectedInvoiceDiscount, setSelectedInvoiceDiscount] = useState(props?.invoice_discounts?.[0]?.invoice_discount_amount);
-    const [invoiceSender, setInvoiceSender] = useState(props?.invoice_sender ?? '');
-    const [formData, setFormData] = useState({
+    const [invoiceUrl, setInvoiceUrl] = useState('');
+    const [invoiceSender] = useState(props?.invoice_sender ?? '');
+    const [formData] = useState({
         invoice_client: props?.invoice_client ?? '',
         invoice_notes: props?.invoice_notes ?? '',
         invoice_terms: props?.invoice_terms ?? '',
     });
     const [logo, setLogo] = useState(props?.invoice_logo ?? settings?.invoice_logo);
-    const [invoiceStatus, setInvoiceStatus] = useState(props?.invoice_status);
-    const [invoiceCurrentStatus, setInvoiceCurrentStatus] = useState(props?.invoice_status);
+    const [invoiceStatus] = useState(props?.invoice_status);
+    const [invoiceCurrentStatus] = useState(props?.invoice_status);
     const [allowedStatuses, setAllowedStatuses] = useState(statuses);
-    const [invoiceData, setInvoiceData] = useState(props ?? {});
-    const [invoiceAvailableStatuses, setInvoiceAvailableStatuses] = useState()
+    const [invoiceData] = useState(props ?? {});
     const navigate = useNavigate()
 
     useEffect(() => {
-        const header = document.querySelector('.header');
-        const content = document.querySelector('.content');
-        const main = document.querySelector('main');
-        if (header) {
-            header.style.display = 'none';
-        }
-
-        if (main) {
-            main.style.padding = 0;
-            main.style.marginTop = '-1rem';
-        }
-
-        if (content) {
-            content.style.backgroundColor = 'transparent';
-        }
+        setInvoiceHeader(false);
         setCurrentPath('/invoices/');
 
         if (props?.invoice_items) {
             setInvoiceItems(props?.invoice_items);
+            setInvoiceUrl(window.location.href)
         }
 
         if (props?.invoice_logo) {
@@ -86,9 +68,7 @@ const InvoicePanel = (props = null) => {
         }
 
         return () => {
-            header.style = false;
-            main.style = false;
-            content.style = false;
+            setInvoiceHeader(true);
         };
     }, [
         currentPath,
@@ -118,7 +98,6 @@ const InvoicePanel = (props = null) => {
             if (!ID && !UUID) {
                 setInvoices((prevInvoices) => [...prevInvoices, ...[response]]);
             }
-            console.log('Holis, ', response)
             navigate(`/invoices/view/${response.UUID}`)
         })
     };
@@ -136,11 +115,11 @@ const InvoicePanel = (props = null) => {
                         </div>
                         <div className='right flex flex-column justify-space-between gap-2 text-right'>
                             <div className='flex justify-end flex-column items-end'>
-                                <h1 className='invoice-title'>
-                                    {__('Invoice', 'app')}
-                                </h1>
-                                <div className='invoice-number flex items-end gap-2 p-relative'>
-                                    <h4>{invoiceData?.invoice_number ?? ''}</h4>
+                                <h2 className='invoice-title uppercase'>
+                                    {sprintf(__('Invoice %s', 'app'), invoiceData?.invoice_number ?? '')}
+                                </h2>
+                                <div className='invoice-qr-code'>
+                                    <QRCodeSVG value={invoiceUrl} size={75} level={'H'}/>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +281,12 @@ const InvoicePanel = (props = null) => {
                             <label htmlFor='invoice_status'>{__('Invoice status', 'app')}</label>}
                         <StatusBadge status={invoiceStatus}/>
                         <div className='flex flex-row gap-3'>
-                            <button className='btn btn-white text-charcoal mt-4'>
+                            <a href='#'
+                               onClick={(event) => {
+                                   event.preventDefault();
+                                   window.print();
+                               }}
+                               className='btn btn-white text-charcoal mt-4'>
                                 <svg xmlns='http://www.w3.org/2000/svg'
                                      height='24px'
                                      viewBox='0 -960 960 960'
@@ -314,8 +298,13 @@ const InvoicePanel = (props = null) => {
                                 <span className='text-charcoal'>
                                     {__('Print', 'app')}
                                 </span>
-                            </button>
-                            <button className='btn btn-danger-light text-charcoal mt-4'>
+                            </a>
+                            <a href='#'
+                               onClick={(event) => {
+                                   event.preventDefault();
+                                   document.print();
+                               }}
+                               className='btn btn-danger-light text-charcoal mt-4'>
                                 <svg xmlns='http://www.w3.org/2000/svg'
                                      height='24px'
                                      viewBox='0 -960 960 960'
@@ -327,7 +316,7 @@ const InvoicePanel = (props = null) => {
                                 <span className='text-danger-dark'>
                                     {__('PDF', 'app')}
                                 </span>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </aside>
