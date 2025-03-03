@@ -19,9 +19,9 @@ const Business = () => {
     useEffect(() => {
         if (!formData && null !== settings) {
             setFormData(settings);
-            setSelectedCountryCode(settings?.invoice_business_fni_country_code);
-            setSelectedCountry(settings?.invoice_business_country);
-            setSelectedState(settings?.invoice_business_state);
+            setSelectedCountryCode(selectedCountryCode ?? settings?.invoice_business_fni_country_code);
+            setSelectedCountry(selectedCountry ?? settings?.invoice_business_country);
+            setSelectedState(selectedState ?? settings?.invoice_business_state);
             setCountries(europeCountries);
         }
     }, [formData, settings, europeCountries]);
@@ -55,6 +55,10 @@ const Business = () => {
         }
         if (name === 'invoice_business_state') {
             setSelectedState(value);
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value,
+            }))
         }
     };
 
