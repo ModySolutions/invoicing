@@ -302,7 +302,6 @@ const InvoicePanel = (props = null) => {
                             <a href='#'
                                onClick={(event) => {
                                    event.preventDefault();
-                                   document.print();
                                }}
                                className='btn btn-danger-light text-charcoal mt-4'>
                                 <svg xmlns='http://www.w3.org/2000/svg'
