@@ -61,7 +61,7 @@ class Api {
             foreach ($insert_fields as $field => $label) {
                 $value = sanitize_text_field($fields[$field]);
                 update_option($field, $value);
-                $data[] = array($field => $fields[$field]);
+                $data[$field] = $fields[$field];
             }
 
             $message = __('Your business information was saved successfully.');
@@ -84,7 +84,7 @@ class Api {
             foreach ($required_fields as $field => $label) {
                 $value = sanitize_text_field($fields[$field]);
                 update_option($field, $value);
-                $data[] = array($field => $fields[$field]);
+                $data[$field] = $fields[$field];
             }
 
             $message = __('Your invoice settings were saved successfully.');

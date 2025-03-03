@@ -10,11 +10,14 @@ import { useNavigate } from "react-router-dom";
 import {toast} from "react-toastify";
 import {useInvoices} from "../contexts/InvoicesContext";
 import Enums from "../tools/Enums";
+import setNextInvoiceNumber from "../tools/setNextInvoiceNumber";
+import setInvoiceHeader from "../tools/setInvoiceHeader";
 
 const InvoiceForm = (props = null) => {
     let {ID, UUID} = props;
     const {settings, setSettings, europeCountries, statuses} = useSettings();
     const {setInvoices} = useInvoices();
+    const [invoiceNumber, setInvoiceNumber] = useState(props?.invoice_number ?? setNextInvoiceNumber(settings?.invoice_last_number))
     const [issuedDate, setIssuedDate] = useState(new Date());
     const [dueDate, setDueDate] = useState(new Date());
     const [dateFormat, setDateFormat] = useState('MMM d, Y');
@@ -44,21 +47,7 @@ const InvoiceForm = (props = null) => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        const header = document.querySelector('.header');
-        const content = document.querySelector('.content');
-        const main = document.querySelector('main');
-        if (header) {
-            header.style.display = 'none';
-        }
-
-        if (main) {
-            main.style.padding = 0;
-            main.style.marginTop = '-1rem';
-        }
-
-        if (content) {
-            content.style.backgroundColor = 'transparent';
-        }
+        setInvoiceHeader(false);
         setCurrentPath('/invoices/');
 
         if (settings?.selected_invoice_tax > 0) {
@@ -84,9 +73,7 @@ const InvoiceForm = (props = null) => {
         }
 
         return () => {
-            header.style = false;
-            main.style = false;
-            content.style = false;
+            setInvoiceHeader(true);
         };
     }, [
         currentPath,
@@ -152,6 +139,10 @@ const InvoiceForm = (props = null) => {
             const quantity = updatedItems[index].item_quantity || 0;
             const price = updatedItems[index].item_price || 0;
             updatedItems[index].item_total = (quantity * price).toFixed(2);
+        }
+
+        if (name === 'invoice_number') {
+            setInvoiceNumber(value);
         }
 
         setInvoiceItems(updatedItems);
@@ -228,6 +219,7 @@ const InvoiceForm = (props = null) => {
                 'invoice_client_address': formData?.invoice_client,
                 'invoice_tax_subtotal': invoiceTaxes,
                 'invoice_discount_subtotal': invoiceDiscounts,
+                'invoice_number': invoiceNumber
             }
         }
 
@@ -288,7 +280,8 @@ const InvoiceForm = (props = null) => {
                                         className='text-right'
                                         name='invoice-number'
                                         id='invoice-number'
-                                        disabled
+                                        value={invoiceNumber}
+                                        onChange={(event) => handleInputChange(index, event)}
                                     />
                                 </div>
                             </div>
@@ -532,7 +525,7 @@ const InvoiceForm = (props = null) => {
                             </select>
                         </div>
                     </div>
-                    <div className='flex flex-column'>
+                    {props?.post_status && <div className='flex flex-column'>
                         <label htmlFor='invoice_status'>{__('Invoice status', 'app')}</label>
                         <select name='invoice_status'
                                 id='invoice_status'
@@ -544,6 +537,7 @@ const InvoiceForm = (props = null) => {
                             })}
                         </select>
                     </div>
+                    }
                 </aside>
             </div>
         </form>

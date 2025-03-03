@@ -24,7 +24,7 @@ const Business = () => {
             setSelectedState(settings?.invoice_business_state);
             setCountries(europeCountries);
         }
-    }, [formData, setFormData, settings, europeCountries]);
+    }, [formData, settings, europeCountries]);
 
     useEffect(() => {
         if (selectedCountry) {
@@ -74,11 +74,11 @@ const Business = () => {
             },
         })
             .then((response) => {
-                const { success, message, newState } = response
+                const { success, message, data } = response
                 if(success) {
                     setSettings(prevState => ({
                         ...prevState,
-                        ...newState
+                        ...data
                     }));
                     toast.success(
                         message || __('Business data update successfully.'),

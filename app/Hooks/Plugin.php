@@ -121,6 +121,14 @@ class Plugin {
                [],
                $app_assets['version']
            );
+
+           wp_enqueue_style(
+               'app-invoice-print',
+               APP_INVOICE_DIR_URL . 'dist/print.css',
+               [],
+               $app_assets['version'],
+               'print'
+           );
         }
     }
 }
