@@ -1,8 +1,5 @@
 export default function (currentNumber) {
-    if(!Number(currentNumber)) {
-        return 1;
-    }
-
+    currentNumber = currentNumber ?? 0
     currentNumber++
     return currentNumber;
 }

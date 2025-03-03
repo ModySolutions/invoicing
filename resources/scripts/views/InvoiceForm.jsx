@@ -17,7 +17,7 @@ const InvoiceForm = (props = null) => {
     let {ID, UUID} = props;
     const {settings, setSettings, europeCountries, statuses} = useSettings();
     const {setInvoices} = useInvoices();
-    const [invoiceNumber, setInvoiceNumber] = useState(props?.invoice_number ?? setNextInvoiceNumber(settings?.invoice_last_number))
+    const [invoiceNumber, setInvoiceNumber] = useState(setNextInvoiceNumber(props?.invoice_number ?? settings?.invoice_last_number))
     const [issuedDate, setIssuedDate] = useState(new Date());
     const [dueDate, setDueDate] = useState(new Date());
     const [dateFormat, setDateFormat] = useState('MMM d, Y');
@@ -89,7 +89,7 @@ const InvoiceForm = (props = null) => {
 
     useEffect(() => {
         handleTaxesAndDiscounts();
-    }, [selectedInvoiceTax, selectedInvoiceDiscount]);
+    }, [selectedInvoiceTax, selectedInvoiceDiscount, invoiceNumber]);
 
     const syncSiteLogo = (invoice_logo_id) => {
         apiFetch({
@@ -141,10 +141,6 @@ const InvoiceForm = (props = null) => {
             updatedItems[index].item_total = (quantity * price).toFixed(2);
         }
 
-        if (name === 'invoice_number') {
-            setInvoiceNumber(value);
-        }
-
         setInvoiceItems(updatedItems);
         handleTaxesAndDiscounts();
     };
@@ -174,6 +170,10 @@ const InvoiceForm = (props = null) => {
             ...prevState,
             [name]: value,
         }))
+        
+        if (name === 'invoice-number') {
+            setInvoiceNumber(value);
+        }
     }
 
     const addItem = () => {
@@ -219,7 +219,7 @@ const InvoiceForm = (props = null) => {
                 'invoice_client_address': formData?.invoice_client,
                 'invoice_tax_subtotal': invoiceTaxes,
                 'invoice_discount_subtotal': invoiceDiscounts,
-                'invoice_number': invoiceNumber
+                'invoice_number': invoiceNumber.toString()
             }
         }
 
@@ -281,7 +281,7 @@ const InvoiceForm = (props = null) => {
                                         name='invoice-number'
                                         id='invoice-number'
                                         value={invoiceNumber}
-                                        onChange={(event) => handleInputChange(index, event)}
+                                        onChange={handleTextChange}
                                     />
                                 </div>
                             </div>
