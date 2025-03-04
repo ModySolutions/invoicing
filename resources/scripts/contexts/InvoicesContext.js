@@ -7,12 +7,18 @@ const InvoicesContext = createContext(null);
 export const InvoicesProvider = ({children}) => {
     const [invoices, setInvoices] = useState(null);
     const [currentStatus, setCurrentStatus] = useState('any');
+    const [fetchNewInvoices, setFetchNewInvoices] = useState(true);
     const [currentStatusLabel, setCurrentStatusLabel] = useState(__('Any', 'app'));
 
     useEffect(() => {
-        apiFetch({path: `/wp/v2/invoice?status=${currentStatus}`})
-            .then(response => setInvoices(response))
-    }, [currentStatus, currentStatusLabel]);
+        if(fetchNewInvoices) {
+            apiFetch({path: `/wp/v2/invoice?status=${currentStatus}&orderby=date&order=desc`})
+            .then(response => {
+                setInvoices(response)
+                setFetchNewInvoices(false);
+            })
+        }
+    }, [currentStatus, currentStatusLabel, fetchNewInvoices]);
 
     return (
         <InvoicesContext.Provider value={{
@@ -21,7 +27,8 @@ export const InvoicesProvider = ({children}) => {
             currentStatus,
             setCurrentStatus,
             currentStatusLabel,
-            setCurrentStatusLabel
+            setCurrentStatusLabel,
+            setFetchNewInvoices
         }}>
             {children}
         </InvoicesContext.Provider>

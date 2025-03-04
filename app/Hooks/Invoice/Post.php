@@ -108,22 +108,6 @@ EOF;
             ), array(
                 'ID' => $post_id
             ));
-
-        if (get_post_status($post_id) === 'invoice_issued') {
-            $invoice_last_number = (int)get_field('invoice_last_number', 'option');
-            $invoice_new_number = $invoice_last_number + 1;
-            $is_number_in_use = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT post_id from {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %d",
-                    'invoice_number',
-                    $invoice_new_number
-                )
-            );
-
-            if($is_number_in_use?->post_id) {
-
-            }
-        }
     }
 
     public static function _is_number_in_use(int $number) : bool {

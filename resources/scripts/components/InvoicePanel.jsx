@@ -11,6 +11,7 @@ import {formatDate} from "../tools/DateFormats";
 import StatusBadge from "./StatusBadge";
 import {QRCodeSVG} from "qrcode.react";
 import setInvoiceHeader from "../tools/setInvoiceHeader";
+import nl2br from "@modycloud/tools/nl2br";
 
 const InvoicePanel = (props = null) => {
     const {ID, UUID} = props;
@@ -130,14 +131,14 @@ const InvoicePanel = (props = null) => {
                                 <label htmlFor='client' className={'d-block'}>
                                     {__('Bill From:', 'app')}
                                 </label>
-                                <span dangerouslySetInnerHTML={{__html: invoiceSender}}/>
+                                <span dangerouslySetInnerHTML={{__html: nl2br(invoiceSender)}}/>
                             </div>
                             <div className='client w-100-p mt-3'>
                                 <label htmlFor='client' className={'d-block'}>
                                     {__('Bill to:', 'app')}
                                 </label>
                                 <span className={'capitalize'}
-                                      dangerouslySetInnerHTML={{__html: formData?.invoice_client}}/>
+                                      dangerouslySetInnerHTML={{__html: nl2br(formData?.invoice_client)}}/>
                             </div>
                         </div>
                         <div className='right flex flex-column justify-end mt-3'>
@@ -263,18 +264,14 @@ const InvoicePanel = (props = null) => {
                     </div>
                 </div>
                 <aside className='sidebar pl-4 pr-4 pt-0 flex flex-column gap-4'>
-                    {invoiceStatus === 'draft' &&
-                        <>
-                            <a href={`#`}
-                               onClick={(event) => {
-                                   event.preventDefault();
-                                   navigate(`/invoices/edit/${props?.UUID}/`)
-                               }} className='btn btn-wide mt-2'>
-                                {__('Edit Invoice', 'app')}
-                            </a>
-                            <hr className='b-bottom-grey-10-4 mx-4'/>
-                        </>
-                    }
+                    <a href={`#`}
+                       onClick={(event) => {
+                           event.preventDefault();
+                           navigate(`/invoices/edit/${props?.UUID}/`)
+                       }} className='btn btn-wide mt-2'>
+                        {__('Edit Invoice', 'app')}
+                    </a>
+                    <hr className='b-bottom-grey-10-4 mx-4'/>
                     <div className='flex flex-column'>
                         {invoiceStatus ===
                             'draft' &&

@@ -16,8 +16,8 @@ import setInvoiceHeader from "../tools/setInvoiceHeader";
 const InvoiceForm = (props = null) => {
     let {ID, UUID} = props;
     const {settings, setSettings, europeCountries, statuses} = useSettings();
-    const {setInvoices} = useInvoices();
-    const [invoiceNumber, setInvoiceNumber] = useState(setNextInvoiceNumber(props?.invoice_number ?? settings?.invoice_last_number))
+    const {setInvoices, setFetchNewInvoices} = useInvoices();
+    const [invoiceNumber, setInvoiceNumber] = useState(props?.invoice_number ?? setNextInvoiceNumber(settings?.invoice_last_number))
     const [issuedDate, setIssuedDate] = useState(new Date());
     const [dueDate, setDueDate] = useState(new Date());
     const [dateFormat, setDateFormat] = useState('MMM d, Y');
@@ -170,7 +170,7 @@ const InvoiceForm = (props = null) => {
             ...prevState,
             [name]: value,
         }))
-        
+
         if (name === 'invoice-number') {
             setInvoiceNumber(value);
         }
@@ -223,9 +223,9 @@ const InvoiceForm = (props = null) => {
             }
         }
 
-        let url = 'wp/v2/invoice';
+        let url = 'invoice/v1/invoice';
         if(ID && UUID) {
-            url = `invoice/v1/invoice/${UUID}`;
+            url += `/${UUID}`;
         }
         apiFetch({
             path: url,
@@ -237,17 +237,31 @@ const InvoiceForm = (props = null) => {
             },
         })
         .then((response) => {
-            toast.success(
-                __('Invoice saved successfully.'),
-                {
-                    autoClose: 3000,
+            if(response.success) {
+                toast.success(
+                    __('Invoice saved successfully.'),
+                    {
+                        autoClose: 3000,
+                    }
+                )
+                if(!ID && !UUID) {
+                    setInvoices((prevInvoices) => [...prevInvoices, ...[response]]);
+                    UUID = response.UUID;
                 }
-            )
-            if(!ID && !UUID) {
-                setInvoices((prevInvoices) => [...prevInvoices, ...[response]]);
-                UUID = response.UUID;
+                setFetchNewInvoices(true);
+                setSettings(prevSettings => ({
+                    ...prevSettings,
+                    ['invoice_last_number'] : response.invoice_last_number
+                }))
+                navigate(`/invoices/view/${UUID}`)
+            } else {
+                toast.error(
+                    response.message ?? __('There was an error saving your invoice'),
+                    {
+                        autoClose: 3000,
+                    }
+                )
             }
-            navigate(`/invoices/view/${UUID}`)
         })
     };
 
@@ -274,9 +288,7 @@ const InvoiceForm = (props = null) => {
                                 </h1>
                                 <div className='invoice-number flex items-end gap-2 p-relative'>
                                     <input
-                                        required
                                         type='text'
-                                        placeholder='#INVOICE NUMBER'
                                         className='text-right'
                                         name='invoice-number'
                                         id='invoice-number'

@@ -3,6 +3,8 @@ import {useState, useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
 import CurrencyFormatter from "./CurrencyFormatter";
 import StatusBadge from "./StatusBadge";
+import {formatDate} from "../tools/DateFormats";
+import {useSettings} from "../contexts/SettingsContext";
 
 const InvoiceRow = ({
                         generated_invoice_number,
@@ -16,9 +18,11 @@ const InvoiceRow = ({
                         statuses
                     }) => {
     let navigate = useNavigate();
+    const {settings} = useSettings();
     const [showEdit] = useState(invoice_status === 'invoice_draft');
     const [showView] = useState(invoice_status !== 'invoice_draft');
     const [clientName, setClientName] = useState(invoice_client);
+    const [dateFormat] = useState(settings?.invoice_date_format);
 
     useEffect(() => {
         const fullName = invoice_client ? invoice_client.split('\n') : [__('unknown', 'app')];
@@ -82,8 +86,12 @@ const InvoiceRow = ({
                 {clientName}
             </strong>
         </td>
-        <td data-title={__('Issued', 'app')}>{invoice_issue_date}</td>
-        <td data-title={__('Due', 'app')}>{invoice_due_date}</td>
+        <td data-title={__('Issued', 'app')}>
+            {formatDate(dateFormat, new Date(invoice_issue_date))}
+        </td>
+        <td data-title={__('Due', 'app')}>
+            {formatDate(dateFormat, new Date(invoice_due_date))}
+        </td>
         <td data-title={__('Amount', 'app')}>
             <strong>
                 <CurrencyFormatter currency='EUR' amount={invoice_total}/>

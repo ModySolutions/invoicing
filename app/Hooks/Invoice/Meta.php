@@ -7,6 +7,7 @@ use function Env\env;
 class Meta {
     public static function register_rest_field(): void {
         register_rest_field('invoice', 'invoice_date', self::invoice_date(...));
+        register_rest_field('invoice', 'invoice_number', self::invoice_number(...));
     }
 
     public static function invoice_date(): array {
@@ -18,6 +19,46 @@ class Meta {
                 $date = strtotime($value);
                 return $date ? update_post_meta($invoice->ID, 'invoice_date', $date) : null;
             }
+        );
+    }
+
+    public static function invoice_number() : array {
+        return array(
+            'get_callback'    => function (array $invoice) {
+                return get_post_meta($invoice['id'], 'invoice_number', true);
+            },
+            'update_callback' => function (string $value, \WP_Post $invoice) {
+                if (empty($value)) {
+                    return new \WP_Error(
+                        'invalid_invoice_number',
+                        __('Invoice number is required.', APP_THEME_LOCALE),
+                        ['status' => 400]
+                    );
+                }
+
+                global $wpdb;
+                $existing_invoice = $wpdb->get_var($wpdb->prepare(
+                    "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'invoice_number' AND meta_value = %s AND post_id != %d",
+                    $value,
+                    $invoice->ID
+                ));
+
+                if ($existing_invoice) {
+                    return new \WP_Error(
+                        'duplicate_invoice_number',
+                        __('Invoice number already taken.', APP_THEME_LOCALE),
+                        ['status' => 400]
+                    );
+                }
+
+                update_option('invoice_last_number', $value);
+                return update_post_meta($invoice->ID, 'invoice_number', $value);
+            },
+            'schema'          => [
+                'description' => 'Número único de factura',
+                'type'        => 'string',
+                'context'     => ['view', 'edit'],
+            ],
         );
     }
 
@@ -87,10 +128,10 @@ class Meta {
                 $invoice_id,
                 false
             ),
-            'invoice_sender' => get_field('invoice_sender', $invoice_id),
-            'invoice_client' => get_field('invoice_client', $invoice_id),
-            'invoice_sender_address' => get_field('invoice_sender_address', $invoice_id),
-            'invoice_client_address' => get_field('invoice_client_address', $invoice_id),
+            'invoice_sender' => get_field('invoice_sender', $invoice_id, false),
+            'invoice_client' => get_field('invoice_client', $invoice_id, false),
+            'invoice_sender_address' => get_field('invoice_sender_address', $invoice_id, false),
+            'invoice_client_address' => get_field('invoice_client_address', $invoice_id, false),
             'invoice_items' => get_field('invoice_items', $invoice_id),
             'invoice_status' => get_post_status($invoice_id),
             'invoice_taxes' => get_field('invoice_taxes', $invoice_id),
