@@ -11,7 +11,7 @@ import {formatDate} from "../tools/DateFormats";
 import StatusBadge from "./StatusBadge";
 import {QRCodeSVG} from "qrcode.react";
 import setInvoiceHeader from "../tools/setInvoiceHeader";
-import nl2br from "@modycloud/tools/nl2br";
+import nl2br from "../tools/nl2br";
 
 const InvoicePanel = (props = null) => {
     const {ID, UUID} = props;
