@@ -41,6 +41,13 @@ class Api {
                     return current_user_can('manage_options');
                 }
             ));
+        register_rest_route('invoice/v1', '/invoice/', array(
+            'methods' => \WP_REST_Server::CREATABLE,
+            'callback' => self::create_invoice(...),
+            'permission_callback' => function () {
+                return current_user_can('manage_options');
+            }
+        ));
     }
 
     public static function get_settings(\WP_REST_Request $request): \WP_REST_Response {
@@ -112,6 +119,24 @@ class Api {
         return rest_ensure_response(Meta::schema($invoice->id));
     }
 
+    public static function create_invoice(\WP_REST_Request $request): \WP_REST_Response {
+        $data = $request->get_params();
+        $form_validation = self::_validate_invoice_data($data['acf'], null);
+        if (!$form_validation['success']) {
+            return rest_ensure_response(array(
+                'success' => $form_validation['success'],
+                'message' => $form_validation['message'],
+            ));
+        }
+
+        $invoice_id = wp_insert_post(array(
+            'post_title' => __('Draft', APP_THEME_LOCALE),
+            'post_type' => APP_INVOICE_POST_TYPE,
+        ));
+
+        return rest_ensure_response(self::_update_invoice($invoice_id, $data));
+    }
+
     public static function update_invoice(\WP_REST_Request $request): \WP_REST_Response {
         $uuid = $request->get_param('uuid');
         if (!$uuid) {
@@ -125,21 +150,41 @@ class Api {
                 'uuid', $uuid));
 
         if (!$invoice) {
-            return rest_ensure_response(array());
+            return rest_ensure_response(array(
+                'success' => false,
+                'message' => __('Non existent invoice UUID', APP_THEME_LOCALE),
+            ));
         }
 
         $invoice_id = $invoice->id;
         $data = $request->get_params();
+        $form_validation = self::_validate_invoice_data($data['acf'], $invoice_id);
+        if (!$form_validation['success']) {
+            return rest_ensure_response(array(
+                'success' => $form_validation['success'],
+                'message' => $form_validation['message'],
+            ));
+        }
+
+        return rest_ensure_response(self::_update_invoice($invoice_id, $data));
+    }
+
+    private static function _update_invoice(int $invoice_id, array $data): array {
+        global $wpdb;
         $invoice_data = get_post($invoice_id);
 
-        if (!$invoice_data)
-            return rest_ensure_response(array());
+        if (!$invoice_data) {
+            return array(
+                'success' => false,
+                'message' => __('Couldn\'t save invoice data', APP_THEME_LOCALE),
+            );
+        }
 
         $wpdb->update($wpdb->posts, array(
-                'post_status' => $data['post_status'],
-            ), array(
-                'ID' => $invoice_id
-            ));
+            'post_status' => $data['post_status'],
+        ), array(
+            'ID' => $invoice_id
+        ));
         wp_update_post(array(
             'ID' => $invoice_id,
             'post_status' => $data['post_status'],
@@ -149,10 +194,72 @@ class Api {
             update_field($key, $value, $invoice_id);
         }
 
-        return rest_ensure_response(array(
+        $invoice_last_number = self::_maybe_update_invoice_last_number($data['acf']['invoice_number']);
+
+        return array_merge(array(
             'message' => __('Invoice updated successfully', APP_THEME_LOCALE),
             'success' => true,
-        ));
+            'invoice_last_number' => $invoice_last_number,
+        ), Meta::schema($invoice_id));
+    }
+
+    private static function _validate_invoice_data(array $data, ?int $invoice_id): array {
+        $valid = true;
+        $required = array(
+            'invoice_number' => __('Invoice number', APP_THEME_LOCALE),
+            'invoice_issue_date' => __('Issue date', APP_THEME_LOCALE),
+            'invoice_sender' => __('Sender', APP_THEME_LOCALE),
+            'invoice_items' => __('Items', APP_THEME_LOCALE),
+            'invoice_currency' => __('Currency', APP_THEME_LOCALE),
+            'invoice_sender_address' => __('Sender', APP_THEME_LOCALE),
+            'invoice_client_address' => __('Client', APP_THEME_LOCALE),
+        );
+
+        foreach ($required as $key => $label) {
+            if (!array_key_exists($key, $data)) {
+                return array(
+                    'success' => false,
+                    'message' => sprintf(__('The %s field is required', APP_THEME_LOCALE), $label)
+                );
+            }
+
+            if (is_string($data[$key]) && $data[$key] == '') {
+                return array(
+                    'success' => false,
+                    'message' => sprintf(__('The %s field is required', APP_THEME_LOCALE), $label)
+                );
+            } elseif (is_array($data[$key])) {
+                foreach ($data[$key] as $item) {
+                    if (empty($item['item_description']) ||
+                        empty($item['item_quantity']) ||
+                        empty($item['item_price'])) {
+                        return array(
+                            'success' => false,
+                            'message' => __('Items should contain a description, quantity and price', APP_THEME_LOCALE),
+                        );
+                    }
+                }
+            }
+        }
+
+        global $wpdb;
+        if ($invoice_id) {
+            $query =
+                "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'invoice_number' AND meta_value = %s AND post_id != %d";
+        } else {
+            $query = "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'invoice_number' AND meta_value = %s";
+        }
+        $existing_invoice = $wpdb->get_var($wpdb->prepare($query, $data['invoice_number'], $invoice_id));
+
+        if ($existing_invoice) {
+            return array(
+                'success' => false,
+                'message' => sprintf(__('The invoice number %s is already taken', APP_THEME_LOCALE),
+                    $data['invoice_number'])
+            );
+        }
+
+        return array('success' => true);
     }
 
     private static function _set_business_settings_fields_labels(): array {
@@ -168,6 +275,15 @@ class Api {
             'invoice_business_city' => __('City', APP_THEME_LOCALE),
             'invoice_business_postal_code' => __('Postal code', APP_THEME_LOCALE)
         );
+    }
+
+    private static function _maybe_update_invoice_last_number(string $invoice_number): string {
+        $invoice_last_number = get_option('invoice_last_number');
+        if ($invoice_number > $invoice_last_number) {
+            update_option('invoice_last_number', $invoice_number);
+            $invoice_last_number = $invoice_number;
+        }
+        return $invoice_last_number;
     }
 
     private static function _set_invoice_settings_fields_labels(): array {
