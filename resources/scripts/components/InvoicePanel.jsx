@@ -129,13 +129,13 @@ const InvoicePanel = (props = null) => {
                         <div className='left'>
                             <div className='sender w-100-p mt-4 d-block'>
                                 <label htmlFor='client' className={'d-block'}>
-                                    {__('Bill From:', 'app')}
+                                    {__('Invoice From:', 'app')}
                                 </label>
                                 <span dangerouslySetInnerHTML={{__html: nl2br(invoiceSender)}}/>
                             </div>
                             <div className='client w-100-p mt-3'>
                                 <label htmlFor='client' className={'d-block'}>
-                                    {__('Bill to:', 'app')}
+                                    {__('Invoice to:', 'app')}
                                 </label>
                                 <span className={'capitalize'}
                                       dangerouslySetInnerHTML={{__html: nl2br(formData?.invoice_client)}}/>

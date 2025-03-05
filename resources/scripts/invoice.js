@@ -12,22 +12,25 @@ import InvoiceNew from '@invoice/views/InvoiceNew';
 import InvoiceEdit from '@invoice/views/InvoiceEdit';
 import InvoiceView from '@invoice/views/InvoiceView';
 import {InvoicesProvider} from "@invoice/contexts/InvoicesContext";
+import {InvoiceProvider} from "@invoice/contexts/InvoiceContext";
 
 const InvoiceContainer = () => {
     return (
         <div>
             <SettingsProvider>
                 <InvoicesProvider>
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path='/invoices' element={<Invoices/>}/>
-                            <Route path='/invoices/new' element={<InvoiceNew/>}/>
-                            <Route path='/invoices/edit/:uuid' element={<InvoiceEdit/>}/>
-                            <Route path='/invoices/view/:uuid' element={<InvoiceView/>}/>
-                            <Route path='/invoices/business' element={<Business/>}/>
-                            <Route path='/invoices/settings' element={<Settings/>}/>
-                        </Routes>
-                    </BrowserRouter>
+                    <InvoiceProvider>
+                        <BrowserRouter>
+                            <Routes>
+                                <Route path='/invoices' element={<Invoices/>}/>
+                                <Route path='/invoices/new' element={<InvoiceNew/>}/>
+                                <Route path='/invoices/edit/:uuid' element={<InvoiceEdit/>}/>
+                                <Route path='/invoices/view/:uuid' element={<InvoiceView/>}/>
+                                <Route path='/invoices/business' element={<Business/>}/>
+                                <Route path='/invoices/settings' element={<Settings/>}/>
+                            </Routes>
+                        </BrowserRouter>
+                    </InvoiceProvider>
                     <ToastContainer draggable position='bottom-right'/>
                 </InvoicesProvider>
             </SettingsProvider>

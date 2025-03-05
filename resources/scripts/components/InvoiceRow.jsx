@@ -86,18 +86,18 @@ const InvoiceRow = ({
                 {clientName}
             </strong>
         </td>
-        <td data-title={__('Issued', 'app')}>
+        <td data-title={__('Issued', 'app')} className='text-center'>
             {formatDate(dateFormat, new Date(invoice_issue_date))}
         </td>
-        <td data-title={__('Due', 'app')}>
+        <td data-title={__('Due', 'app')} className='text-center'>
             {formatDate(dateFormat, new Date(invoice_due_date))}
         </td>
-        <td data-title={__('Amount', 'app')}>
+        <td data-title={__('Amount', 'app')} className='text-right'>
             <strong>
                 <CurrencyFormatter currency='EUR' amount={invoice_total}/>
             </strong>
         </td>
-        <td data-title={__('Status', 'app')}>
+        <td data-title={__('Status', 'app')} className='text-center'>
             <StatusBadge status={invoice_status} />
         </td>
         <td data-title={__('Method', 'app')}>--</td>

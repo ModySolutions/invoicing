@@ -23,5 +23,11 @@ export default {
       "invoice_paid": ['btn-text-warning-dark', 'btn-warning-light'],
       "invoice_cancelled": ['btn-text-danger-dark', 'btn-danger-light'],
     }
+  },
+  "TAXES": {
+    "IVA": 21,
+  },
+  "DISCOUNTS": {
+    "IRPF": 15,
   }
 }
