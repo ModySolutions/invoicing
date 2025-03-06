@@ -1,0 +1,1 @@
+<div id="app-invoice-container"></div>

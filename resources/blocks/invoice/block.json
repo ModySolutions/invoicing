@@ -1,13 +1,19 @@
 {
-  "name": "app/invoice",
-  "title": "Invoice",
-  "description": "",
-  "category": "invoice",
-  "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"#005f6b\"><path d=\"M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z\"/></svg>",
-  "keywords": ["invoices", "clients", "invoice", "items", "products"],
-  "acf": {
-    "mode": "edit",
-    "post_types": ["page"],
-    "renderTemplate": "./invoice-template.php"
-  }
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "app/invoice-v2",
+	"version": "0.1.0",
+	"title": "Invoice V2",
+	"category": "invoice",
+	"description": "Invoicing app.",
+	"example": {},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "app",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
 }
