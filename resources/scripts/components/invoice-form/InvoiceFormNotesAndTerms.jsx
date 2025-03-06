@@ -1,7 +1,7 @@
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {__} from "@wordpress/i18n";
 
-const InvoiceNotes = () => {
+const InvoiceFormNotesAndTerms = () => {
     const {invoice, setInvoice} = useInvoice();
 
     const handleTextChange = (event) => {
@@ -53,4 +53,4 @@ const InvoiceNotes = () => {
     )
 }
 
-export default InvoiceNotes;
+export default InvoiceFormNotesAndTerms;

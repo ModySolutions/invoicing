@@ -5,7 +5,7 @@ import CurrencyFormatter from "../CurrencyFormatter";
 import HandleTaxesAndDiscounts from "../../tools/HandleTaxesAndDiscounts";
 import InvoiceItemsTableHeader from "../invoice-common/InvoiceItemsTableHeader";
 
-const InvoiceItemsTable = () => {
+const InvoiceFormItemsTable = () => {
     const {invoice, setInvoice} = useInvoice();
     const defaultItemValues = {
         'item_description': '',
@@ -127,4 +127,4 @@ const InvoiceItemsTable = () => {
     )
 }
 
-export default InvoiceItemsTable;
+export default InvoiceFormItemsTable;

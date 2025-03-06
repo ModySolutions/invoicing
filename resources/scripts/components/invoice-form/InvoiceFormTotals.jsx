@@ -3,7 +3,7 @@ import {__, sprintf} from "@wordpress/i18n";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import CurrencyFormatter from "../CurrencyFormatter";
 
-const InvoiceTotals = () => {
+const InvoiceFormTotals = () => {
     const {invoice} = useInvoice();
     useEffect(() => {
 
@@ -54,4 +54,4 @@ const InvoiceTotals = () => {
     )
 }
 
-export default InvoiceTotals;
+export default InvoiceFormTotals;
