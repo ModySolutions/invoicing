@@ -15,11 +15,11 @@ import setInvoiceHeader from "../tools/setInvoiceHeader";
 import {useInvoice} from "../contexts/InvoiceContext";
 import InvoiceFormHeader from "../components/invoice-form/InvoiceFormHeader";
 import InvoiceFormDetails from "../components/invoice-form/InvoiceFormDetails";
-import InvoiceItemsTable from "../components/invoice-form/InvoiceItemsTable";
-import InvoiceNotes from "../components/invoice-form/InvoiceNotes";
-import InvoiceTotals from "../components/invoice-form/InvoiceTotals";
+import InvoiceFormItemsTable from "../components/invoice-form/InvoiceFormItemsTable";
+import InvoiceFormNotesAndTerms from "../components/invoice-form/InvoiceFormNotesAndTerms";
 import InvoiceFormSidebar from "../components/invoice-form/InvoiceFormSidebar";
 import HandleTaxesAndDiscounts from "../tools/HandleTaxesAndDiscounts";
+import InvoiceTotals from "../components/invoice-common/InvoiceTotals";
 
 const Container = () => {
     return (
@@ -36,9 +36,9 @@ const InvoiceFormContainer = ({invoice}) => {
             <InvoiceFormHeader/>
             <InvoiceFormDetails/>
             <div className='mt-4 invoices-table-container'>
-                <InvoiceItemsTable />
+                <InvoiceFormItemsTable />
                 <div className='grid grid-cols-6-4'>
-                    <InvoiceNotes />
+                    <InvoiceFormNotesAndTerms />
                     <InvoiceTotals />
                 </div>
             </div>
@@ -62,12 +62,14 @@ const InvoiceForm = (props = null) => {
             ['invoice_tax_amount']: invoice?.invoice_tax_amount ?? Enums.TAXES.IVA,
             ['invoice_discount_amount']: invoice?.invoice_discount_amount ?? Enums.DISCOUNTS.IRPF,
         }));
+
+        return () => {
+            setInvoiceHeader(true);
+        };
     }, []);
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        // console.log({...invoice, ...HandleTaxesAndDiscounts(invoice)})
-        // return;
 
         let url = 'invoice/v1/invoice';
         if (ID && UUID) {

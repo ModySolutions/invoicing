@@ -1,4 +1,4 @@
-import InvoiceForm from "@invoice/views/InvoiceForm";
+import InvoiceForm from "@invoice/components/InvoiceForm";
 
 const InvoiceNew = () => {
     return (

@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import apiFetch from "@wordpress/api-fetch";
 import {__} from '@wordpress/i18n';
 import {useState, useEffect} from "react";
-import InvoiceForm from "./InvoiceForm";
+import InvoiceForm from "@invoice/components/InvoiceForm";
 
 const InvoiceEdit = () => {
     const {uuid} = useParams();

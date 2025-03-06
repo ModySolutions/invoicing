@@ -5,8 +5,8 @@ import InvoicePanelHeader from "./invoice-panel/InvoicePanelHeader";
 import InvoicePanelDetails from "./invoice-panel/InvoicePanelDetails";
 import InvoicePanelItemsTable from "./invoice-panel/InvoicePanelItemsTable";
 import InvoicePanelNotesAndTerms from "./invoice-panel/InvoicePanelNotesAndTerms";
-import InvoicePanelTotals from "./invoice-panel/InvoicePanelTotals";
 import InvoicePanelSidebar from "./invoice-panel/InvoicePanelSidebar";
+import InvoiceTotals from "./invoice-common/InvoiceTotals";
 
 const InvoicePanelContainer = () => {
     return (
@@ -15,9 +15,9 @@ const InvoicePanelContainer = () => {
             <InvoicePanelDetails />
             <div className='mt-4 invoices-table-container'>
                 <InvoicePanelItemsTable />
-                <div className='grid grid-cols-7-3 mt-5'>
+                <div className='grid grid-cols-6-4 mt-5'>
                     <InvoicePanelNotesAndTerms />
-                    <InvoicePanelTotals />
+                    <InvoiceTotals />
                 </div>
             </div>
         </div>
