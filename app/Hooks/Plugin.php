@@ -6,7 +6,7 @@ use Invoice\Hooks\Invoice\Post;
 use Invoice\Hooks\Invoice\Settings;
 
 class Plugin {
-    const last_update = 'Rare|Backache|Length|Petrichor';
+    const last_update = 'Rare|Backache|Length|Savage';
     public static function init() : void {
         add_action('init', self::wp_init(...));
         add_action('wp_enqueue_scripts', self::wp_enqueue_scripts(...), 100);
