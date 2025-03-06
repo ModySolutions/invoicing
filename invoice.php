@@ -18,7 +18,11 @@ namespace Invoice;
 define('APP_INVOICE_DIR', __DIR__);
 define('APP_INVOICE_DIR_URL', plugin_dir_url(__FILE__));
 define('APP_INVOICE_POST_TYPE', 'invoice');
-define('APP_INVOICE_BLOCK_CONTENT', '<!-- wp:app/invoice {"name":"app/invoice","data":array(),"mode":"edit"} /-->');
+define('APP_INVOICE_BLOCK_CONTENT', <<<EOF
+<!-- wp:app/invoice-v2 -->
+<p class="wp-block-app-invoice-v2">Example – hello from the saved content!</p>
+<!-- /wp:app/invoice-v2 -->
+EOF);
 
 require_once __DIR__ . '/vendor/autoload.php';
 class Invoice
