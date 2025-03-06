@@ -10,19 +10,18 @@ const InvoiceFormDetails = () => {
     const {invoice, setInvoice} = useInvoice();
     const {settings} = useSettings();
     const [issuedDate, setIssuedDate] = useState(invoice?.invoice_issue_date ?? new Date());
+    const [invoiceSender, setInvoiceSender] = useState([
+        settings?.invoice_business_fni.toString().toUpperCase(),
+        capitalize(settings?.invoice_business_name.toString()),
+        capitalize([
+            settings?.invoice_business_city.toString(),
+            findCountryByIsoCode(settings?.invoice_business_country)?.name,
+        ].join(', ')),
+    ].join("\n"));
     const [dueDate, setDueDate] = useState(invoice?.invoice_due_date ?? new Date());
     const [dateFormat] = useState(settings?.invoice_date_format ?? 'MMM d, Y');
 
     useEffect(() => {
-        const invoiceSender = [
-            settings?.invoice_business_fni.toString().toUpperCase(),
-            capitalize(settings?.invoice_business_name.toString()),
-            capitalize([
-                settings?.invoice_business_city.toString(),
-                findCountryByIsoCode(settings?.invoice_business_country)?.name,
-            ].join(', ')),
-        ].join("\n");
-
         setInvoice(prevState => ({
             ...prevState,
             ['invoice_sender']: invoiceSender,
@@ -47,6 +46,10 @@ const InvoiceFormDetails = () => {
             [name]: value,
         }));
 
+        if(name === 'invoice_sender') {
+            setInvoiceSender(value);
+        }
+
         if(name === 'invoice_client') {
             setInvoice(prevState => ({
                 ...prevState,
@@ -59,25 +62,26 @@ const InvoiceFormDetails = () => {
         <div className='grid grid-cols-7-3'>
             <div className='left'>
                 <div className='sender w-100-p mt-4'>
+                    <label htmlFor='invoice_sender'>{__('Invoice to:', 'app')}</label>
                     <textarea required
                               className={'input-lg no-resize'}
                               placeholder={__('Who is this from?', 'app')}
-                              name='sender'
-                              id='sender'
-                              value={invoice?.invoice_sender}
+                              name='invoice_sender'
+                              id='invoice_sender'
+                              value={invoiceSender}
                               onChange={handleTextChange}
                               cols='30'
                               rows='3'></textarea>
                 </div>
                 <div className='client w-100-p mt-3'>
-                    <label htmlFor='client'>{__('Bill to:', 'app')}</label>
+                    <label htmlFor='invoice_client'>{__('Bill to:', 'app')}</label>
                     <textarea required
                               className={'input-lg no-resize'}
                               placeholder={__('Who is this to?', 'app')}
                               name='invoice_client'
                               onChange={handleTextChange}
                               value={invoice?.invoice_client}
-                              id='client'
+                              id='invoice_client'
                               cols='30'
                               rows='3'></textarea>
                 </div>
