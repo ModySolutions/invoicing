@@ -9,7 +9,7 @@ class Blocks {
 
     public static function register_block_types(): void
     {
-        $block_types = glob(APP_INVOICE_DIR . '/dist/blocks/*');
+        $block_types = glob(APP_INVOICE_DIR . '/blocks/*');
         if (count($block_types) > 0) {
             foreach ($block_types as $block) {
                 if (is_dir($block)) {
