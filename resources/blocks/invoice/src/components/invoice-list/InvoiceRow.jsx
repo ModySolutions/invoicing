@@ -2,9 +2,9 @@ import {__} from '@wordpress/i18n';
 import {useState, useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
 import {formatDate} from "@invoice/tools/DateFormats";
-import {useSettings} from "../contexts/SettingsContext";
-import CurrencyFormatter from "./invoice-common/CurrencyFormatter";
-import StatusBadge from "./StatusBadge";
+import {useSettings} from "../../contexts/SettingsContext";
+import CurrencyFormatter from "../invoice-common/CurrencyFormatter";
+import InvoiceStatusBadge from "../invoice-common/InvoiceStatusBadge";
 
 const InvoiceRow = ({
                         generated_invoice_number,
@@ -98,7 +98,7 @@ const InvoiceRow = ({
             </strong>
         </td>
         <td data-title={__('Status', 'app')} className='text-center'>
-            <StatusBadge status={invoice_status} />
+            <InvoiceStatusBadge status={invoice_status} />
         </td>
         <td data-title={__('Method', 'app')}>--</td>
         <td className='text-center' data-title={__('Actions', 'app')}>

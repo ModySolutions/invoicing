@@ -1,6 +1,6 @@
 import Enums from "@invoice/tools/Enums";
 
-const StatusBadge = ({status}) => {
+const InvoiceStatusBadge = ({status}) => {
     return (
         <span className={`btn btn-xs ${Enums.STATUS.COLORS[status]?.join(' ')}`}>
             {Enums.STATUS.LABELS[status]}
@@ -8,4 +8,4 @@ const StatusBadge = ({status}) => {
     )
 }
 
-export default StatusBadge;
+export default InvoiceStatusBadge;

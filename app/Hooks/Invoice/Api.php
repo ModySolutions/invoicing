@@ -41,6 +41,15 @@ class Api {
                     return current_user_can('manage_options');
                 }
             ));
+        register_rest_route('invoice/v1',
+            '/invoice/status/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})',
+            array(
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => self::update_invoice_status(...),
+                'permission_callback' => function () {
+                    return current_user_can('manage_options');
+                }
+            ));
         register_rest_route('invoice/v1', '/invoice/', array(
             'methods' => \WP_REST_Server::CREATABLE,
             'callback' => self::create_invoice(...),
@@ -167,6 +176,39 @@ class Api {
         }
 
         return rest_ensure_response(self::_update_invoice($invoice_id, $data));
+    }
+
+    public static function update_invoice_status(\WP_REST_Request $request) : \WP_REST_Response {
+        $success = true;
+        $message = '';
+        $uuid = $request->get_param('uuid');
+        if (!$uuid) {
+            return rest_ensure_response(array());
+        }
+
+        $uuid = sanitize_text_field($uuid);
+        global $wpdb;
+        $invoice =
+            $wpdb->get_row($wpdb->prepare("SELECT post_id as id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
+                'uuid', $uuid));
+
+        if (!$invoice) {
+            return rest_ensure_response(array(
+                'success' => false,
+                'message' => __('Non existent invoice UUID', APP_THEME_LOCALE),
+            ));
+        }
+
+        $invoice_id = $invoice->id;
+        wp_update_post(array(
+            'ID' => $invoice_id,
+            'post_status' => $request->get_param('invoice_status'),
+        ));
+
+        return rest_ensure_response(array(
+            'success' => true,
+            'message' => __('Invoice status updated', APP_THEME_LOCALE),
+        ));
     }
 
     private static function _update_invoice(int $invoice_id, array $data): array {

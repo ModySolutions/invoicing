@@ -1,5 +1,5 @@
 import {useState} from "react";
-import InvoiceStatuses from "../components/InvoiceStatuses";
+import InvoiceStatuses from "../components/invoice-list/InvoiceStatuses";
 import InvoicesList from "../components/InvoicesList";
 
 const Invoices = () => {
