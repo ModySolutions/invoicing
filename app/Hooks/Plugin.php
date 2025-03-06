@@ -70,23 +70,23 @@ class Plugin {
                 '7.6' => __('7.6% - Rental (Ceuta and Melilla)',APP_THEME_LOCALE),
             );
 
-            $invoices = get_posts(array(
-                'post_type' => 'invoice',
-                'post_status' => 'any',
-                'numberposts' => -1
-            ));
-            if(count($invoices)) {
-                global $wpdb;
-                foreach($invoices as $invoice) {
-                    $wpdb->delete(
-                        $wpdb->postmeta,
-                        array(
-                            'post_id' => $invoice->ID,
-                        )
-                    );
-                    wp_delete_post($invoice->ID, true);
-                }
-            }
+//            $invoices = get_posts(array(
+//                'post_type' => 'invoice',
+//                'post_status' => 'any',
+//                'numberposts' => -1
+//            ));
+//            if(count($invoices)) {
+//                global $wpdb;
+//                foreach($invoices as $invoice) {
+//                    $wpdb->delete(
+//                        $wpdb->postmeta,
+//                        array(
+//                            'post_id' => $invoice->ID,
+//                        )
+//                    );
+//                    wp_delete_post($invoice->ID, true);
+//                }
+//            }
 
             update_post_meta($invoice_page_id, 'routes', $invoice_routes);
             update_post_meta($invoice_page_id, 'main_cta', $main_cta);
