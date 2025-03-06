@@ -10,7 +10,7 @@ const DropFileInput = props => {
     const [logo, setLogo] = useState(props?.logo);
     const [className, setClassName] = useState('bg-cultured');
     const [uploading, setUploading] = useState(false);
-    const [disabled, setDisabled] = useState(props?.disabled ?? false)
+    const [disabled, setDisabled] = useState(props?.disabled )
 
     const onDragEnter = () => wrapperRef.current.classList.add('dragover');
     const onDragLeave = () => wrapperRef.current.classList.remove('dragover');
@@ -82,7 +82,7 @@ const DropFileInput = props => {
                          style={{'overflow': 'hidden'}}>
                         {logo ? (
                             <div>
-                                <a href='#' onClick={fileRemove} className='close p-absolute top right'>&times;</a>
+                                {!props?.disabled && <a href='#' onClick={fileRemove} className='close p-absolute top right'>&times;</a>}
                                 <img alt={__('Invoice logo', 'app')} src={logo.toString()} className='w-100-p h-auto object-cover'/>
                             </div>
                         ) : (
@@ -94,6 +94,7 @@ const DropFileInput = props => {
                        value=''
                        className='w-150 h-100 p-absolute top center'
                        style={{'opacity': '0'}}
+                       disabled={props?.disabled}
                        onChange={onFileDrop}/>
             </div>
         </>

@@ -18,7 +18,9 @@ const HandleTaxesAndDiscounts = (invoice) => {
     return {
         ['invoice_subtotal']: parseFloat(subtotal ?? 0),
         ['invoice_taxes_total']: parseFloat(taxes ?? 0),
+        ['invoice_tax_subtotal']: parseFloat(taxes ?? 0),
         ['invoice_discount_total']: discounts ?? 0,
+        ['invoice_discount_subtotal']: discounts ?? 0,
         ['invoice_total']: ((subtotal - discounts) + taxes) ?? 0,
     }
 };
