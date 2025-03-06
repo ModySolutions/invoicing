@@ -1,13 +1,18 @@
+import {useEffect, useState} from "react";
 import {sprintf, __} from '@wordpress/i18n';
 import {useInvoices} from "../contexts/InvoicesContext";
-import InvoiceRow from '../components/InvoiceRow';
+import InvoiceRow from '../components/invoice-list/InvoiceRow';
 
 const InvoicesList = ({statuses}) => {
     const {currentStatusLabel, currentStatus, invoices} = useInvoices();
-    const noInvoicesText = currentStatus === 'any' ? __('You have no invoices', 'app') : sprintf(
-        __('You have no <strong>%s</strong> invoices', 'app'),
-        currentStatusLabel
-    )
+    const [noInvoicesText, setNoInvoicesText] = useState(__('You have no invoices', 'app'));
+
+    useEffect(() => {
+        setNoInvoicesText(currentStatus === 'any' ? __('You have no invoices', 'app') : sprintf(
+            __('You have no <strong>%s</strong> invoices', 'app'),
+            currentStatusLabel
+        ))
+    }, [currentStatus])
 
     return (
         <div className='mt-4 invoices-table-container'>

@@ -1,1 +1,163 @@
-button[class*=btn-status].active{position:relative}button[class*=btn-status].active:after{border-bottom:.125rem solid var(--color-grey-80,#000);bottom:-.3125rem;content:" ";position:absolute;width:60%}.invoices-table-container{overflow-x:auto}.invoices-table-container .invoices-table{border-collapse:separate;border-spacing:0;margin-top:1.25rem;width:100%}.invoices-table-container .invoices-table td,.invoices-table-container .invoices-table th{border-bottom:.0625rem solid var(--color-grey-20,#ccc);padding:.625rem}.invoices-table-container .invoices-table th{background-color:var(--color-cultured,#f5f5f5);color:var(--color-charcoal,#333);font-weight:700}.invoices-table-container .invoices-table th:first-of-type{border-bottom-left-radius:var(--border-radius-sm,.5rem);border-top-left-radius:var(--border-radius-sm,.5rem)}.invoices-table-container .invoices-table th:last-of-type{border-bottom-right-radius:var(--border-radius-sm,.5rem);border-top-right-radius:var(--border-radius-sm,.5rem)}.invoices-table-container .invoices-table.inverse tr:nth-child(2n){background-color:var(--color-cultured,#f5f5f5)}.invoices-table-container .invoices-table.inverse th{background-color:var(--color-charcoal,#333);color:var(--color-cultured,#f5f5f5)}.invoices-table-container .invoices-table.inverse td{border-bottom:none}.invoices-table-container .invoices-table td{color:var(--color-charcoal,#333);font-size:.875rem}.invoices-table-container .invoices-table tfoot td,.invoices-table-container .invoices-table tfoot tr{border:none}.invoices-table-container .invoices-table .status{font-weight:700}.invoices-table-container .invoices-table .status-paid{color:green}.invoices-table-container .invoices-table .status-pending{color:orange}.invoices-table-container .invoices-table .status-expired{color:red}.invoices-table-container .invoices-table .actions{display:flex;gap:.625rem}@media(max-width:768px){.invoices-table-container .invoices-table{font-size:12px}.invoices-table-container .invoices-table td,.invoices-table-container .invoices-table th{padding:8px}.invoices-table-container .invoices-table th{display:none}.invoices-table-container .invoices-table td{display:block;padding-left:50%;position:relative;text-align:right}.invoices-table-container .invoices-table td:before{content:attr(data-title);font-weight:700;left:.625rem;position:absolute;top:.625rem}}.react-datepicker__input-container input{text-align:right}.invoice-form>.grid{grid-template-columns:1fr}@media (min-width:60rem){.invoice-form>.grid{grid-template-columns:3fr 1fr}.invoice-form>.grid .client,.invoice-form>.grid .sender{max-width:21.875rem}}@media (max-width:80.625rem){.invoice-form>.grid{grid-template-columns:3fr 1fr}}.invoice-form .invoice-header{grid-template-columns:1fr 1fr}.invoice-form .invoice-header .invoice-number{max-width:18.75rem}.invoice-form .invoice-header .invoice-number-label{padding:.3rem .5rem;position:absolute}.invoice-form .sidebar{max-width:21.875rem}@media (max-width:80.625rem){.invoice-form .sidebar{margin-right:1rem;width:12.5rem}}@media (max-width:42.5rem){.invoice-form .sidebar{display:none}}.invoice-panel .d-block{display:block}.drop-file-input__label .logo:hover .close{display:flex}.drop-file-input__label .close{align-items:center;background-color:var(--color-danger);border-radius:50%;color:var(--color-black);display:none;height:1.25rem;justify-content:center;width:1.25rem}
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/.pnpm/css-loader@6.11.0_webpack@5.97.1/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/.pnpm/postcss-loader@6.2.1_postcss@8.4.49_webpack@5.97.1/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/.pnpm/sass-loader@12.6.0_sass@1.83.1_webpack@5.97.1/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./resources/scss/invoice.scss ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+button[class*=btn-status].active {
+  position: relative;
+}
+button[class*=btn-status].active:after {
+  content: " ";
+  position: absolute;
+  bottom: -0.3125rem;
+  width: 60%;
+  border-bottom: 0.125rem solid var(--color-grey-80, #000);
+}
+
+.invoices-table-container {
+  overflow-x: auto;
+}
+.invoices-table-container .invoices-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1.25rem;
+}
+.invoices-table-container .invoices-table th, .invoices-table-container .invoices-table td {
+  padding: 0.625rem;
+  border-bottom: 0.0625rem solid var(--color-grey-20, #CCC);
+}
+.invoices-table-container .invoices-table th {
+  background-color: var(--color-cultured, #f5f5f5);
+  font-weight: bold;
+  color: var(--color-charcoal, #333);
+}
+.invoices-table-container .invoices-table th:first-of-type {
+  border-bottom-left-radius: var(--border-radius-sm, 0.5rem);
+  border-top-left-radius: var(--border-radius-sm, 0.5rem);
+}
+.invoices-table-container .invoices-table th:last-of-type {
+  border-bottom-right-radius: var(--border-radius-sm, 0.5rem);
+  border-top-right-radius: var(--border-radius-sm, 0.5rem);
+}
+.invoices-table-container .invoices-table.inverse tr:nth-child(even) {
+  background-color: var(--color-cultured, #f5f5f5);
+}
+.invoices-table-container .invoices-table.inverse th {
+  background-color: var(--color-charcoal, #333);
+  color: var(--color-cultured, #f5f5f5);
+}
+.invoices-table-container .invoices-table.inverse td {
+  border-bottom: none;
+}
+.invoices-table-container .invoices-table td {
+  font-size: 0.875rem;
+  color: var(--color-charcoal, #333);
+}
+.invoices-table-container .invoices-table tfoot tr, .invoices-table-container .invoices-table tfoot td {
+  border: none;
+}
+.invoices-table-container .invoices-table .status {
+  font-weight: bold;
+}
+.invoices-table-container .invoices-table .status-paid {
+  color: green;
+}
+.invoices-table-container .invoices-table .status-pending {
+  color: orange;
+}
+.invoices-table-container .invoices-table .status-expired {
+  color: red;
+}
+.invoices-table-container .invoices-table .actions {
+  display: flex;
+  gap: 0.625rem;
+}
+@media (max-width: 768px) {
+  .invoices-table-container .invoices-table {
+    font-size: 12px;
+  }
+  .invoices-table-container .invoices-table th, .invoices-table-container .invoices-table td {
+    padding: 8px;
+  }
+  .invoices-table-container .invoices-table th {
+    display: none;
+  }
+  .invoices-table-container .invoices-table td {
+    display: block;
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+  .invoices-table-container .invoices-table td:before {
+    content: attr(data-title);
+    position: absolute;
+    left: 0.625rem;
+    top: 0.625rem;
+    font-weight: bold;
+  }
+}
+
+.react-datepicker__input-container input {
+  text-align: right;
+}
+
+.invoice-form > .grid {
+  grid-template-columns: 1fr;
+}
+@media all and (min-width: 60rem) {
+  .invoice-form > .grid {
+    grid-template-columns: 3fr 1fr;
+  }
+  .invoice-form > .grid .sender,
+  .invoice-form > .grid .client {
+    max-width: 21.875rem;
+  }
+}
+@media all and (max-width: 80.625rem) {
+  .invoice-form > .grid {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+.invoice-form .invoice-header {
+  grid-template-columns: 1fr 1fr;
+}
+.invoice-form .invoice-header .invoice-number {
+  max-width: 18.75rem;
+}
+.invoice-form .invoice-header .invoice-number-label {
+  position: absolute;
+  padding: 0.3rem 0.5rem;
+}
+.invoice-form .sidebar {
+  max-width: 21.875rem;
+}
+@media all and (max-width: 80.625rem) {
+  .invoice-form .sidebar {
+    width: 12.5rem;
+    margin-right: 1rem;
+  }
+}
+@media all and (max-width: 42.5rem) {
+  .invoice-form .sidebar {
+    display: none;
+  }
+}
+
+.invoice-panel .d-block {
+  display: block;
+}
+
+.drop-file-input__label .logo:hover .close {
+  display: flex;
+}
+.drop-file-input__label .close {
+  border-radius: 50%;
+  background-color: var(--color-danger);
+  color: var(--color-black);
+  width: 1.25rem;
+  height: 1.25rem;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+/*# sourceMappingURL=view.css.map*/

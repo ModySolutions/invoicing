@@ -1,5 +1,5 @@
 import {__} from '@wordpress/i18n';
-import {useInvoices} from "../contexts/InvoicesContext";
+import {useInvoices} from "../../contexts/InvoicesContext";
 import Enums from "@invoice/tools/Enums";
 
 const StatusButton = ({textClassName, bgClassName, status, label, onClick, active}) => {
@@ -14,16 +14,21 @@ const StatusButton = ({textClassName, bgClassName, status, label, onClick, activ
 };
 
 const InvoiceStatuses = ({statuses}) => {
-    const {currentStatus, setCurrentStatus, setCurrentStatusLabel} = useInvoices();
+    const {currentStatus, setCurrentStatus, setCurrentStatusLabel, setFetchNewInvoices} = useInvoices();
+
+    const handleSetStatus = (status, label) => {
+        console.log(status, label)
+        setCurrentStatus(status);
+        setCurrentStatusLabel(label)
+        setFetchNewInvoices(true);
+    }
+
     return (
         <div className={'flex gap-1 justify-start'}>
             <StatusButton
                 textClassName='text-charcoal'
                 bgClassName='btn-grey-80'
-                onClick={() => {
-                    setCurrentStatus('any')
-                    setCurrentStatusLabel(__('Any', 'app'));
-                }}
+                onClick={() => handleSetStatus('any', 'Any')}
                 active={currentStatus === 'any'}
                 status='any'
                 label={__('Any')}/>
@@ -34,12 +39,9 @@ const InvoiceStatuses = ({statuses}) => {
                     textClassName={textClassName}
                     bgClassName={bgClassName}
                     status={status}
-                    onClick={() => {
-                        setCurrentStatus(status);
-                        setCurrentStatusLabel(data?.name)
-                    }}
+                    onClick={() => handleSetStatus(status, Enums.STATUS.LABELS[status])}
                     active={currentStatus === status}
-                    label={data?.label}
+                    label={Enums.STATUS.LABELS[status]}
                     key={`invoice-status-filter-btn-${status}`}
                 />
             })}

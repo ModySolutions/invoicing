@@ -1,7 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import {__} from "@wordpress/i18n";
 import {useInvoice} from "../../contexts/InvoiceContext";
-import StatusBadge from "../StatusBadge";
+import InvoiceStatusDropdown from "../invoice-common/InvoiceStatusDropdown";
 
 const InvoicePanelEditButton = () => {
     const {invoice} = useInvoice();
@@ -65,7 +65,7 @@ const InvoicePanelSidebar = () => {
             <InvoicePanelEditButton />
             <hr className='b-bottom-grey-10-4 mx-4'/>
             <div className='flex flex-column'>
-                <StatusBadge status={invoice?.invoice_status}/>
+                <InvoiceStatusDropdown status={invoice?.invoice_status}/>
                 <div className='flex flex-row gap-3'>
                     <InvoicePanelPrintButton />
                     <InvoicePanelToPDFButton />

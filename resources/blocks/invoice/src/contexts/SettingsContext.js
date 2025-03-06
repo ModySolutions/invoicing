@@ -4,7 +4,7 @@ import {createRoot} from "@wordpress/element";
 import apiFetch from '@wordpress/api-fetch';
 import EuropeCountries from "@invoice/tools/EuropeCountries";
 import {navigate} from "@invoice/tools/navigate";
-import Links from "../components/Links";
+import Links from "../components/invoice-common/Links";
 
 const SettingsContext = createContext(null);
 
