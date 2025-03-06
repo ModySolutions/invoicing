@@ -18,13 +18,14 @@ jobs:
         env:
           cache-name: cache-vendors
         with:
-          path: vendors
-          key: vendors
+          path: vendor
+          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock') }}
           restore-keys: |
-            vendors
+            vendor-${{ runner.os }}-
 
       - name: Composer Install
         run: composer install --no-dev -o
+        if: steps.cache-vendor.outputs.cache-hit != 'true'
 
       - name: Install backend dependencies
         uses: php-actions/composer@v6
@@ -42,23 +43,26 @@ jobs:
           cache-name: cache-node_modules
         with:
           path: node_modules
-          key: node_modules
+          key: node_modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            node_modules
+            node_modules-${{ runner.os }}-
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      - name: Use Node.js ${{ matrix.node-version }}
+
+      - name: nvm use ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
 
-      - name: Build frontend
+      - name: pnpm install
+        run: pnpm install
+        if: steps.cache-node_modules.outputs.cache-hit != 'true'
+
+      - name: pnpm build
         run: pnpm build
 
       - name: Set up SSH
