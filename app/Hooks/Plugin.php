@@ -6,7 +6,7 @@ use Invoice\Hooks\Invoice\Post;
 use Invoice\Hooks\Invoice\Settings;
 
 class Plugin {
-    const last_update = 'Rare|Backache|Peter|Savage';
+    const last_update = 'Rare|Frontend|Peter|Savage';
     public static function init() : void {
         add_action('init', self::wp_init(...));
         add_action('wp_enqueue_scripts', self::wp_enqueue_scripts(...), 100);
@@ -26,6 +26,11 @@ class Plugin {
                     'post_content' => APP_INVOICE_BLOCK_CONTENT
                 ));
             }
+
+            wp_update_post(array(
+                'ID' => $invoice_page_id,
+                'post_content' => APP_INVOICE_BLOCK_CONTENT
+            ));
 
             $invoice_routes = array(
                 '/invoices/' => __('Invoices', 'app'),
