@@ -5,6 +5,7 @@ import {findCountryByIsoCode} from "@invoice/tools/Countries";
 import capitalize from "@invoice/tools/capitalize";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {useSettings} from "../../contexts/SettingsContext";
+import Enums from "../../../../../scripts/tools/Enums";
 
 const InvoiceFormDetails = () => {
     const {invoice, setInvoice} = useInvoice();
@@ -19,7 +20,7 @@ const InvoiceFormDetails = () => {
         ].join(', ')),
     ].join("\n"));
     const [dueDate, setDueDate] = useState(invoice?.invoice_due_date ?? '');
-    const [dateFormat] = useState(settings?.invoice_date_format ?? 'MMM d, Y');
+    const [dateFormat] = useState(Enums.DATE.FORMATS?.[settings?.invoice_date_format] ?? 'MMM d, Y');
 
     useEffect(() => {
         setInvoice(prevState => ({

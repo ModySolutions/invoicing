@@ -1,8 +1,6 @@
 import {useState, useEffect} from 'react';
 import {__} from '@wordpress/i18n';
-import {findCountryByIsoCode} from "@invoice/tools/Countries";
 import nl2br from "@invoice/tools/nl2br";
-import capitalize from "@invoice/tools/capitalize";
 import {formatDate} from "@invoice/tools/DateFormats";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {useSettings} from "../../contexts/SettingsContext";
