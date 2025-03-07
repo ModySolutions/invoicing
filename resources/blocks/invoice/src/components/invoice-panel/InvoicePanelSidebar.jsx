@@ -2,6 +2,8 @@ import {useNavigate} from "react-router-dom";
 import {__} from "@wordpress/i18n";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import InvoiceStatusDropdown from "../invoice-common/InvoiceStatusDropdown";
+import {toast} from "react-toastify";
+import {useInvoices} from "../../contexts/InvoicesContext";
 
 const InvoicePanelEditButton = () => {
     const {invoice} = useInvoice();
@@ -59,13 +61,42 @@ const InvoicePanelToPDFButton = () => {
 
 const InvoicePanelSidebar = () => {
     const {invoice} = useInvoice();
+    const {setFetchNewInvoices} = useInvoices();
 
     return (
         <aside className='sidebar pl-4 pr-4 pt-0 flex flex-column gap-4'>
             <InvoicePanelEditButton />
             <hr className='b-bottom-grey-10-4 mx-4'/>
             <div className='flex flex-column'>
-                <InvoiceStatusDropdown status={invoice?.invoice_status}/>
+                <InvoiceStatusDropdown
+                    onClick={(status) => {
+                        apiFetch({
+                            path: `invoice/v1/invoice/status/${UUID}`,
+                            method: 'POST',
+                            data: {
+                                'invoice_status' : status,
+                            },
+                        })
+                        .then((response) => {
+                            if (response.success) {
+                                toast.success(
+                                    __('Status updated successfully.'),
+                                    {
+                                        autoClose: 3000,
+                                    }
+                                )
+                                setFetchNewInvoices(true);
+                            } else {
+                                toast.error(
+                                    response.message ?? __('There was an error updating your invoice status'),
+                                    {
+                                        autoClose: 3000,
+                                    }
+                                )
+                            }
+                        })
+                    }}
+                    status={invoice?.invoice_status}/>
                 <div className='flex flex-row gap-3'>
                     <InvoicePanelPrintButton />
                     <InvoicePanelToPDFButton />

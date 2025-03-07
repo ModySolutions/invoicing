@@ -24,19 +24,17 @@ const InvoicePanelContainer = () => {
     )
 }
 
-const InvoicePanel = (props = null) => {
-    const {invoice, setInvoice} = useInvoice(props);
+const InvoicePanel = () => {
     const [currentPath, setCurrentPath] = useState(window.location.path);
 
     useEffect(() => {
         setInvoiceHeader(false);
         setCurrentPath('/invoices/');
-        setInvoice(props);
 
         return () => {
             setInvoiceHeader(true);
         };
-    }, [props]);
+    }, []);
 
     return (
         <div className={'invoice-form invoice-panel mt-3 mb-5 p-relative'}>

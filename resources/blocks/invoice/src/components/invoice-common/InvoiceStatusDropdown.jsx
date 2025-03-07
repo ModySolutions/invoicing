@@ -6,7 +6,7 @@ import Enums from "@invoice/tools/Enums";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {useInvoices} from "../../contexts/InvoicesContext";
 
-const InvoiceStatusDropdown = ({status}) => {
+const InvoiceStatusDropdown = ({status, onClick = (status) => {}}) => {
     const {invoice, setInvoice} = useInvoice();
     const {setFetchNewInvoices} = useInvoices();
     const [isOpen, setIsOpen] = useState(false);
@@ -19,31 +19,7 @@ const InvoiceStatusDropdown = ({status}) => {
             ['invoice_status']: status
         }));
         const {UUID} = invoice;
-        apiFetch({
-            path: `invoice/v1/invoice/status/${UUID}`,
-            method: 'POST',
-            data: {
-                'invoice_status' : status,
-            },
-        })
-        .then((response) => {
-            if (response.success) {
-                toast.success(
-                    __('Status updated successfully.'),
-                    {
-                        autoClose: 3000,
-                    }
-                )
-                setFetchNewInvoices(true);
-            } else {
-                toast.error(
-                    response.message ?? __('There was an error updating your invoice status'),
-                    {
-                        autoClose: 3000,
-                    }
-                )
-            }
-        })
+        onClick(status);
     }
 
     return (
@@ -58,7 +34,9 @@ const InvoiceStatusDropdown = ({status}) => {
                     {Object.values(options).map((status, index) => {
                         if(status?.draft) return '';
                         return (
-                            <li key={`status-dropdown-${index}`} onClick={() => handleOnClick(status)}>
+                            <li key={`status-dropdown-${index}`} onClick={() => {
+                                handleOnClick(status)
+                            }}>
                                 {__(Enums.STATUS.LABELS[status], 'app')}
                             </li>
                         )

@@ -26,7 +26,7 @@ const InvoiceFormNotesAndTerms = () => {
                         )}
                         onChange={handleTextChange}
                         name='invoice_notes'
-                        value={invoice?.invoice_notes}
+                        value={invoice?.invoice_notes ?? ''}
                         id='notes'
                         cols='30'
                         rows='3'></textarea>
@@ -43,7 +43,7 @@ const InvoiceFormNotesAndTerms = () => {
                         )}
                         onChange={handleTextChange}
                         name='invoice_terms'
-                        value={invoice?.invoice_terms}
+                        value={invoice?.invoice_terms ?? ''}
                         id='terms'
                         cols='30'
                         rows='3'></textarea>

@@ -9,7 +9,7 @@ import {useSettings} from "../../contexts/SettingsContext";
 const InvoiceFormDetails = () => {
     const {invoice, setInvoice} = useInvoice();
     const {settings} = useSettings();
-    const [issuedDate, setIssuedDate] = useState(invoice?.invoice_issue_date ?? new Date());
+    const [issuedDate, setIssuedDate] = useState(invoice?.invoice_issue_date);
     const [invoiceSender, setInvoiceSender] = useState([
         settings?.invoice_business_fni.toString().toUpperCase(),
         capitalize(settings?.invoice_business_name.toString()),
@@ -18,7 +18,7 @@ const InvoiceFormDetails = () => {
             findCountryByIsoCode(settings?.invoice_business_country)?.name,
         ].join(', ')),
     ].join("\n"));
-    const [dueDate, setDueDate] = useState(invoice?.invoice_due_date ?? new Date());
+    const [dueDate, setDueDate] = useState(invoice?.invoice_due_date);
     const [dateFormat] = useState(settings?.invoice_date_format ?? 'MMM d, Y');
 
     useEffect(() => {
@@ -80,7 +80,7 @@ const InvoiceFormDetails = () => {
                               placeholder={__('Who is this to?', 'app')}
                               name='invoice_client'
                               onChange={handleTextChange}
-                              value={invoice?.invoice_client}
+                              value={invoice?.invoice_client ?? ''}
                               id='invoice_client'
                               cols='30'
                               rows='3'></textarea>

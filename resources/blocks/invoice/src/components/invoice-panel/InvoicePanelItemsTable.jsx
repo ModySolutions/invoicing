@@ -20,7 +20,7 @@ const InvoicePanelItemsTable = () => {
         <table className='invoices-table inverse'>
             <InvoiceItemsTableHeader />
             <tbody>
-            {invoice?.invoice_items?.map((item, index) => {
+            {invoice?.invoice_items && invoice?.invoice_items?.map((item, index) => {
                 return (
                     <tr key={`invoice-item-${index}`} className='border-0'>
                         <td data-title={__('Description', 'app')}>

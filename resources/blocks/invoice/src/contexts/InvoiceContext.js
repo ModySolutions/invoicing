@@ -1,4 +1,5 @@
 import React, {createContext, useState, useContext, useEffect} from 'react';
+import apiFetch from "@wordpress/api-fetch";
 
 const InvoiceContext = createContext(null);
 
@@ -7,8 +8,7 @@ export const InvoiceProvider = ({children}) => {
     const [invoiceUuid, setInvoiceUuid] = useState(null);
 
     useEffect(() => {
-
-    }, [invoiceUuid, invoice]);
+    }, [invoice]);
 
     return (
         <InvoiceContext.Provider value={{

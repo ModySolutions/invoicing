@@ -6,7 +6,7 @@ use Invoice\Hooks\Invoice\Post;
 use Invoice\Hooks\Invoice\Settings;
 
 class Plugin {
-    const last_update = 'Rare|Frontend|Peter|Savage';
+    const last_update = 'Rare|Rear|Peter|Savage';
     public static function init() : void {
         add_action('init', self::wp_init(...));
         add_action('wp_enqueue_scripts', self::wp_enqueue_scripts(...), 100);
@@ -69,24 +69,6 @@ class Plugin {
                 6 => __('6% - Professionals (from Ceuta and Melilla)',APP_THEME_LOCALE),
                 '7.6' => __('7.6% - Rental (Ceuta and Melilla)',APP_THEME_LOCALE),
             );
-
-//            $invoices = get_posts(array(
-//                'post_type' => 'invoice',
-//                'post_status' => 'any',
-//                'numberposts' => -1
-//            ));
-//            if(count($invoices)) {
-//                global $wpdb;
-//                foreach($invoices as $invoice) {
-//                    $wpdb->delete(
-//                        $wpdb->postmeta,
-//                        array(
-//                            'post_id' => $invoice->ID,
-//                        )
-//                    );
-//                    wp_delete_post($invoice->ID, true);
-//                }
-//            }
 
             update_post_meta($invoice_page_id, 'routes', $invoice_routes);
             update_post_meta($invoice_page_id, 'main_cta', $main_cta);
