@@ -38,5 +38,11 @@ export default {
     'item_price': '',
     'item_taxable': true,
     'item_total': '0',
+  },
+  "DATE": {
+    "FORMATS": {
+      'MMM d, Y': 'MMM d, Y',
+      'd/M/Y': 'dd/MM/YYYY'
+    }
   }
 }
