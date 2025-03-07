@@ -199,8 +199,6 @@ class Api {
     }
 
     public static function update_invoice_status(\WP_REST_Request $request) : \WP_REST_Response {
-        $success = true;
-        $message = '';
         $uuid = $request->get_param('uuid');
         if (!$uuid) {
             return rest_ensure_response(array());
@@ -242,16 +240,6 @@ class Api {
             );
         }
 
-        $wpdb->update($wpdb->posts, array(
-            'post_status' => $data['post_status'],
-        ), array(
-            'ID' => $invoice_id
-        ));
-        wp_update_post(array(
-            'ID' => $invoice_id,
-            'post_status' => $data['post_status'],
-        ));
-
         foreach ($data['acf'] as $key => $value) {
             update_field($key, $value, $invoice_id);
         }
@@ -266,7 +254,6 @@ class Api {
     }
 
     private static function _validate_invoice_data(array $data, ?int $invoice_id): array {
-        $valid = true;
         $required = array(
             'invoice_number' => __('Invoice number', APP_THEME_LOCALE),
             'invoice_issue_date' => __('Issue date', APP_THEME_LOCALE),

@@ -5,7 +5,7 @@ import InvoiceListTableHeader from "./invoice-list/InvoiceListTableHeader";
 import InvoiceListTableBody from "./invoice-list/InvoiceListTableBody";
 
 const InvoicesList = ({statuses}) => {
-    const {currentStatusLabel, currentStatus, invoices} = useInvoices();
+    const {currentStatusLabel, currentStatus} = useInvoices();
     const [noInvoicesText, setNoInvoicesText] = useState(__('You have no invoices', 'app'));
 
     useEffect(() => {
@@ -16,8 +16,8 @@ const InvoicesList = ({statuses}) => {
     }, [currentStatus])
 
     return (
-        <div className='mt-4 invoices-table-container'>
-            <table className='invoices-table'>
+        <div className='invoices-table-container'>
+            <table className='invoices-table mt-2'>
                 <InvoiceListTableHeader />
                 <InvoiceListTableBody statuses={statuses}/>
             </table>

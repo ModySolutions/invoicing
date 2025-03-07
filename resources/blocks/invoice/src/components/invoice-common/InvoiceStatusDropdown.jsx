@@ -4,7 +4,14 @@ import Enums from "@invoice/tools/Enums";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {useInvoices} from "../../contexts/InvoicesContext";
 
-const InvoiceStatusDropdown = ({status, onClick = (status) => {}}) => {
+const InvoiceStatusDropdown = ({
+                                   status,
+                                   onClick = (status) => {
+                                   },
+                                   className = '',
+                                   params = {}
+                               }) => {
+    const {showAll, allValue, allLabel} = params;
     const {invoice, setInvoice} = useInvoice();
     const [isOpen, setIsOpen] = useState(false);
     const [options, setOptions] = useState(Enums.STATUS)
@@ -15,21 +22,25 @@ const InvoiceStatusDropdown = ({status, onClick = (status) => {}}) => {
             ...prevState,
             ['invoice_status']: status
         }));
-        const {UUID} = invoice;
-        onClick(status);
+        onClick(status, Enums.STATUS.LABELS[status]);
     }
 
     return (
-        <div className='dropdown'>
+        <div className={`dropdown ${className}`}>
             <button onClick={() => setIsOpen(!isOpen)} type='button'
                     className={`btn btn-wide btn-xs ${Enums.STATUS.COLORS[status]?.join(' ')}`}>
                 {Enums.STATUS.LABELS[status]}
-                <span className="caret">▼</span>
+                <span className='caret'>▼</span>
             </button>
             {isOpen && (
-                <ul className="dropdown-menu">
+                <ul className='dropdown-menu'>
+                    {showAll && <li onClick={() => {
+                        handleOnClick(allValue)
+                    }}>
+                        {allLabel}
+                    </li>}
                     {Object.values(options).map((status, index) => {
-                        if(status?.draft) return '';
+                        if (status?.draft) return '';
                         return (
                             <li key={`status-dropdown-${index}`} onClick={() => {
                                 handleOnClick(status)

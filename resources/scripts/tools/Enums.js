@@ -8,6 +8,7 @@ export default {
     "PAID": "invoice_paid",
     "CANCELLED": "invoice_cancelled",
     "LABELS": {
+      "any": __('Any', 'app'),
       "draft": __('Draft', 'app'),
       "invoice_issued": __('Issued', 'app'),
       "invoice_sent": __('Sent', 'app'),
@@ -16,6 +17,7 @@ export default {
       "invoice_cancelled": __('Cancelled', 'app'),
     },
     "COLORS": {
+      "any": ['text-charcoal', 'btn-grey-80'],
       "draft": ['btn-text-charcoal', 'btn-chinese-white'],
       "invoice_issued": ['btn-text-charcoal-inverse', 'btn-secondary'],
       "invoice_sent": ['btn-text-info-dark', 'btn-info-light'],
