@@ -14,10 +14,8 @@ const SubmitButton = () => (
 const InvoiceSettings = () => {
     const {invoice, setInvoice} = useInvoice();
     const {settings} = useSettings();
-    const [invoiceTaxAmount, setInvoiceTaxAmount] = useState(invoice?.invoice_tax_amount ?? Enums.TAXES.IVA);
-    const [invoiceDiscountAmount, setInvoiceDiscountAmount] = useState(
-        invoice?.invoice_discount_amount ?? Enums.DISCOUNTS.IRPF
-    );
+    const [invoiceTaxAmount, setInvoiceTaxAmount] = useState(invoice?.invoice_tax_amount ?? '');
+    const [invoiceDiscountAmount, setInvoiceDiscountAmount] = useState(invoice?.invoice_discount_amount ?? '');
 
     useEffect(() => {
         setInvoice(prevState => ({

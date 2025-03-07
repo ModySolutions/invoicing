@@ -4,17 +4,11 @@ import HandleTaxesAndDiscounts from "@invoice/tools/HandleTaxesAndDiscounts";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import CurrencyFormatter from "../invoice-common/CurrencyFormatter";
 import InvoiceItemsTableHeader from "../invoice-common/InvoiceItemsTableHeader";
+import Enums from "../../../../../scripts/tools/Enums";
 
 const InvoiceFormItemsTable = () => {
     const {invoice, setInvoice} = useInvoice();
-    const defaultItemValues = {
-        'item_description': '',
-        'item_quantity': '',
-        'item_price': '',
-        'item_taxable': true,
-        'item_total': '0',
-    };
-    const [invoiceItems, setInvoiceItems] = useState(invoice?.invoice_items ?? [defaultItemValues]);
+    const [invoiceItems, setInvoiceItems] = useState(invoice?.invoice_items ?? [Enums.DEFAULT_ITEMS]);
 
     useEffect(() => {
         setInvoice(prevState  => ({
@@ -24,7 +18,7 @@ const InvoiceFormItemsTable = () => {
     }, [invoiceItems]);
 
     const addItem = () => {
-        setInvoiceItems([...invoiceItems, {...defaultItemValues}]);
+        setInvoiceItems([...invoiceItems, {...Enums.DEFAULT_ITEMS}]);
     };
 
     const removeItem = (index) => {
@@ -60,7 +54,7 @@ const InvoiceFormItemsTable = () => {
         <table className='invoices-table inverse'>
             <InvoiceItemsTableHeader />
             <tbody>
-            {invoiceItems.map((item, index) => {
+            {invoiceItems && invoiceItems?.map((item, index) => {
                 return (
                     <tr key={`invoice-item-${index}`} className='border-0'>
                         <td data-title={__('Description', 'app')}>

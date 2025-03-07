@@ -50,6 +50,13 @@ class Api {
                     return current_user_can('manage_options');
                 }
             ));
+        register_rest_route('invoice/v1', '/invoice/new-invoice', array(
+            'methods' => \WP_REST_Server::CREATABLE,
+            'callback' => self::new_invoice(...),
+            'permission_callback' => function () {
+                return current_user_can('manage_options');
+            }
+        ));
         register_rest_route('invoice/v1', '/invoice/', array(
             'methods' => \WP_REST_Server::CREATABLE,
             'callback' => self::create_invoice(...),
@@ -126,6 +133,19 @@ class Api {
                 'uuid', $uuid));
 
         return rest_ensure_response(Meta::schema($invoice->id));
+    }
+
+    public static function new_invoice(\WP_REST_Request $request) : \WP_REST_Response {
+        $invoice_id = wp_insert_post(array(
+            'post_title' => __('Draft', APP_THEME_LOCALE),
+            'post_type' => APP_INVOICE_POST_TYPE,
+        ));
+        return rest_ensure_response(
+            self::_update_invoice(
+                $invoice_id,
+                $request->get_params()
+            )
+        );
     }
 
     public static function create_invoice(\WP_REST_Request $request): \WP_REST_Response {

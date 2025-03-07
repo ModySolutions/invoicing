@@ -13,11 +13,10 @@ const StatusButton = ({textClassName, bgClassName, status, label, onClick, activ
     );
 };
 
-const InvoiceStatuses = ({statuses}) => {
+const InvoiceListStatusButtons = ({statuses}) => {
     const {currentStatus, setCurrentStatus, setCurrentStatusLabel, setFetchNewInvoices} = useInvoices();
 
     const handleSetStatus = (status, label) => {
-        console.log(status, label)
         setCurrentStatus(status);
         setCurrentStatusLabel(label)
         setFetchNewInvoices(true);
@@ -48,4 +47,4 @@ const InvoiceStatuses = ({statuses}) => {
         </div>
     )
 }
-export default InvoiceStatuses
+export default InvoiceListStatusButtons

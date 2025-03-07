@@ -1,7 +1,6 @@
 import {useState, useEffect} from "react"
 import apiFetch from "@wordpress/api-fetch";
 import {__} from "@wordpress/i18n";
-import setNextInvoiceNumber from "@invoice/tools/setNextInvoiceNumber";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {useSettings} from "../../contexts/SettingsContext";
 import DropFileInput from "../DropFileInput";
@@ -10,18 +9,17 @@ const InvoiceFormHeader = () => {
     const {invoice, setInvoice} = useInvoice();
     const {settings, setSettings} = useSettings();
     const [logo, setLogo] = useState(settings?.invoice_logo ?? '');
-    const [invoiceNumber, setInvoiceNumber] = useState(
-        (invoice?.invoice_number ?? setNextInvoiceNumber(settings?.invoice_last_number))
-        .toString()
-    );
+    const [invoiceNumber, setInvoiceNumber] = useState(invoice?.invoice_number?.toString());
 
     useEffect(() => {
         setInvoice(prevState => ({
             ...prevState,
             ['invoice_number']: invoiceNumber,
-            ['invoice_currency']: 'EUR'
         }))
     }, [invoiceNumber]);
+
+    useEffect(() => {
+    }, [invoice])
 
     const syncSiteLogo = (invoice_logo_id) => {
         apiFetch({

@@ -29,5 +29,12 @@ export default {
   },
   "DISCOUNTS": {
     "IRPF": 15,
+  },
+  "DEFAULT_ITEMS": {
+    'item_description': '',
+    'item_quantity': '',
+    'item_price': '',
+    'item_taxable': true,
+    'item_total': '0',
   }
 }

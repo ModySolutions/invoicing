@@ -1,5 +1,5 @@
 import {useState} from "react";
-import InvoiceStatuses from "../components/invoice-list/InvoiceStatuses";
+import InvoiceListStatusButtons from "../components/invoice-list/InvoiceListStatusButtons";
 import InvoicesList from "../components/InvoicesList";
 
 const Invoices = () => {
@@ -8,7 +8,7 @@ const Invoices = () => {
     return (
         <>
             <div>
-                <InvoiceStatuses statuses={statuses}/>
+                <InvoiceListStatusButtons statuses={statuses}/>
                 <InvoicesList statuses={statuses} />
             </div>
 

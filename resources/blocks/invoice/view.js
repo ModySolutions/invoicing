@@ -9,10 +9,9 @@ import {SettingsProvider} from './src/contexts/SettingsContext';
 import {ToastContainer} from 'react-toastify';
 import Business from './src/views/Business';
 import InvoiceNew from './src/views/InvoiceNew';
-import InvoiceEdit from './src/views/InvoiceEdit';
-import InvoiceView from './src/views/InvoiceView';
 import {InvoicesProvider} from "./src/contexts/InvoicesContext";
 import {InvoiceProvider} from "./src/contexts/InvoiceContext";
+import InvoiceViewOrEdit from "./src/views/InvoiceViewOrEdit";
 
 const InvoiceContainer = () => {
     return (
@@ -24,8 +23,8 @@ const InvoiceContainer = () => {
                             <Routes>
                                 <Route path='/invoices' element={<Invoices/>}/>
                                 <Route path='/invoices/new' element={<InvoiceNew/>}/>
-                                <Route path='/invoices/edit/:uuid' element={<InvoiceEdit/>}/>
-                                <Route path='/invoices/view/:uuid' element={<InvoiceView/>}/>
+                                <Route path='/invoices/edit/:uuid' element={<InvoiceViewOrEdit action='edit'/>}/>
+                                <Route path='/invoices/view/:uuid' element={<InvoiceViewOrEdit action='view'/>}/>
                                 <Route path='/invoices/business' element={<Business/>}/>
                                 <Route path='/invoices/settings' element={<Settings/>}/>
                             </Routes>

@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {__} from '@wordpress/i18n';
 import apiFetch from "@wordpress/api-fetch";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "react-toastify";
 import Enums from "@invoice/tools/Enums";
 import setInvoiceHeader from "@invoice/tools/setInvoiceHeader";
@@ -41,10 +41,12 @@ const InvoiceFormContainer = ({invoice}) => {
     )
 }
 
-const InvoiceForm = (props = null) => {
-    let {ID, UUID} = props;
+const InvoiceForm = () => {
     const {setSettings} = useSettings();
+    const {uuid} = useParams();
     const {invoice, setInvoice} = useInvoice();
+    const [ID] = useState(invoice?.UUID === uuid ? invoice?.ID : undefined);
+    const [UUID, setUUID] = useState(invoice?.UUID === uuid ? invoice?.UUID : undefined);
     const [currentPath, setCurrentPath] = useState(window.location.path);
     const {setFetchNewInvoices} = useInvoices();
     const navigate = useNavigate()
@@ -62,6 +64,8 @@ const InvoiceForm = (props = null) => {
             setInvoiceHeader(true);
         };
     }, []);
+
+    useEffect(() => {}, [invoice]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -86,7 +90,7 @@ const InvoiceForm = (props = null) => {
                     }
                 )
                 if (!ID && !UUID) {
-                    UUID = response.UUID;
+                    setUUID(response.UUID);
                 }
                 setFetchNewInvoices(true);
                 setSettings(prevSettings => ({
@@ -109,7 +113,7 @@ const InvoiceForm = (props = null) => {
         <form onSubmit={handleSubmit}
               className={'invoice-form mt-3 mb-5 p-relative'}
               encType='multipart/form-data'>
-            <Container invoice={props}/>
+            <Container />
         </form>
     )
 }
