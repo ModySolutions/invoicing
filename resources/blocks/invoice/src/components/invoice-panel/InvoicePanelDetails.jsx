@@ -13,14 +13,6 @@ const InvoicePanelDetails = () => {
     const [issuedDate] = useState(invoice?.invoice_issue_date ?? new Date());
     const [dueDate] = useState(invoice?.invoice_due_date ?? new Date());
     const [dateFormat] = useState(settings?.invoice_date_format ?? 'MMM d, Y');
-    const [invoiceSender, setInvoiceSender] = useState([
-        settings?.invoice_business_fni.toString().toUpperCase(),
-        capitalize(settings?.invoice_business_name?.toString() ?? ''),
-        capitalize([
-            settings?.invoice_business_city?.toString() ?? '',
-            findCountryByIsoCode(settings?.invoice_business_country)?.name ?? '',
-        ].join(', ')),
-    ].join("\n"));
 
     useEffect(() => {
     }, [invoice, settings])
@@ -32,7 +24,7 @@ const InvoicePanelDetails = () => {
                     <label htmlFor='client' className={'d-block'}>
                         {__('Invoice From:', 'app')}
                     </label>
-                    <span dangerouslySetInnerHTML={{__html: nl2br(invoiceSender ?? '')}}/>
+                    <span dangerouslySetInnerHTML={{__html: nl2br(invoice?.invoice_sender ?? '')}}/>
                 </div>
                 <div className='client w-100-p mt-3'>
                     <label htmlFor='client' className={'d-block'}>
