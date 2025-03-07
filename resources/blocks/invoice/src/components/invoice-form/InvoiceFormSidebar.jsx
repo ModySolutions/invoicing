@@ -26,7 +26,6 @@ const InvoiceSettings = () => {
     }, [invoiceTaxAmount, invoiceDiscountAmount]);
 
     useEffect(() => {
-        console.log(invoice)
     }, [invoice]);
 
     const handleSelectChange = (event) => {

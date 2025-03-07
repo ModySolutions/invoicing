@@ -9,7 +9,7 @@ import {useSettings} from "../../contexts/SettingsContext";
 const InvoiceFormDetails = () => {
     const {invoice, setInvoice} = useInvoice();
     const {settings} = useSettings();
-    const [issuedDate, setIssuedDate] = useState(invoice?.invoice_issue_date);
+    const [issuedDate, setIssuedDate] = useState(invoice?.invoice_issue_date ?? '');
     const [invoiceSender, setInvoiceSender] = useState(invoice?.invoice_sender ?? [
         settings?.invoice_business_fni.toString().toUpperCase(),
         capitalize(settings?.invoice_business_name.toString()),
@@ -18,7 +18,7 @@ const InvoiceFormDetails = () => {
             findCountryByIsoCode(settings?.invoice_business_country)?.name,
         ].join(', ')),
     ].join("\n"));
-    const [dueDate, setDueDate] = useState(invoice?.invoice_due_date);
+    const [dueDate, setDueDate] = useState(invoice?.invoice_due_date ?? '');
     const [dateFormat] = useState(settings?.invoice_date_format ?? 'MMM d, Y');
 
     useEffect(() => {
