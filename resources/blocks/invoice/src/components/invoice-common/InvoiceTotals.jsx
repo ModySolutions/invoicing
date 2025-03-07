@@ -6,7 +6,6 @@ import CurrencyFormatter from "../invoice-common/CurrencyFormatter";
 const InvoiceFormTotals = () => {
     const {invoice} = useInvoice();
     useEffect(() => {
-
     }, [invoice]);
     return (
         <div className='right flex flex-column justify-end pr-2'>

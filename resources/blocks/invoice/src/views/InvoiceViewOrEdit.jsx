@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import {__} from '@wordpress/i18n';
 import apiFetch from "@wordpress/api-fetch";
 import {useParams} from "react-router-dom";
@@ -9,6 +9,7 @@ import InvoiceForm from "../components/InvoiceForm";
 const InvoiceViewOrEdit = ({action}) => {
     const {uuid} = useParams();
     const {invoice, setInvoice, invoiceUuid, setInvoiceUuid, setFetchNewInvoice} = useInvoice()
+    const [loading,setLoading] = useState(true);
 
     useEffect(() => {
         setInvoiceUuid(uuid);
@@ -17,8 +18,10 @@ const InvoiceViewOrEdit = ({action}) => {
             .then(response => {
                 setInvoice(response);
                 setInvoiceUuid(response?.UUID)
+                setLoading(false);
             })
             .catch(error => {
+                setLoading(false);
                 console.error(error)
             })
         }
@@ -31,7 +34,7 @@ const InvoiceViewOrEdit = ({action}) => {
     return (
         <>
             {
-                invoiceUuid ?
+                !loading && invoiceUuid ?
                 action === 'view' ? <InvoicePanel /> : <InvoiceForm /> :
                 <em>{__('Loading', 'app')}</em>
             }

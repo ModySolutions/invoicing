@@ -1,14 +1,11 @@
 import {useState} from 'react';
 import {__} from '@wordpress/i18n';
-import {toast} from "react-toastify";
-import apiFetch from "@wordpress/api-fetch";
 import Enums from "@invoice/tools/Enums";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {useInvoices} from "../../contexts/InvoicesContext";
 
 const InvoiceStatusDropdown = ({status, onClick = (status) => {}}) => {
     const {invoice, setInvoice} = useInvoice();
-    const {setFetchNewInvoices} = useInvoices();
     const [isOpen, setIsOpen] = useState(false);
     const [options, setOptions] = useState(Enums.STATUS)
 

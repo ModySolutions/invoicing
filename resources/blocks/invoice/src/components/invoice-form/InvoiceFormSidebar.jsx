@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {__} from "@wordpress/i18n";
 import HandleTaxesAndDiscounts from "@invoice/tools/HandleTaxesAndDiscounts";
-import Enums from "@invoice/tools/Enums";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {useSettings} from "../../contexts/SettingsContext";
 
@@ -25,6 +24,10 @@ const InvoiceSettings = () => {
             ...HandleTaxesAndDiscounts(invoice)
         }))
     }, [invoiceTaxAmount, invoiceDiscountAmount]);
+
+    useEffect(() => {
+        console.log(invoice)
+    }, [invoice]);
 
     const handleSelectChange = (event) => {
         const {name, value} = event.target;
