@@ -129,6 +129,7 @@ class Meta {
                 false
             ),
             'invoice_sender' => get_field('invoice_sender', $invoice_id, false),
+            'invoice_currency' => get_field('invoice_currency', $invoice_id, false),
             'invoice_client' => get_field('invoice_client', $invoice_id, false),
             'invoice_sender_address' => get_field('invoice_sender_address', $invoice_id, false),
             'invoice_client_address' => get_field('invoice_client_address', $invoice_id, false),

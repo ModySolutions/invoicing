@@ -272,7 +272,6 @@ class Api {
             'invoice_issue_date' => __('Issue date', APP_THEME_LOCALE),
             'invoice_sender' => __('Sender', APP_THEME_LOCALE),
             'invoice_items' => __('Items', APP_THEME_LOCALE),
-            'invoice_currency' => __('Currency', APP_THEME_LOCALE),
             'invoice_sender_address' => __('Sender', APP_THEME_LOCALE),
             'invoice_client_address' => __('Client', APP_THEME_LOCALE),
         );
