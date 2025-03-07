@@ -72,7 +72,7 @@ const InvoicePanelSidebar = () => {
                 <InvoiceStatusDropdown
                     onClick={(status) => {
                         apiFetch({
-                            path: `invoice/v1/invoice/status/${UUID}`,
+                            path: `invoice/v1/invoice/status/${invoice?.UUID}`,
                             method: 'POST',
                             data: {
                                 'invoice_status' : status,
