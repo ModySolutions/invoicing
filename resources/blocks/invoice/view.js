@@ -1,5 +1,5 @@
 import '@inscss/invoice.scss';
-import React from 'react';
+import React, {useEffect} from 'react';
 import domReady from '@wordpress/dom-ready';
 import {createRoot} from '@wordpress/element';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
@@ -14,6 +14,10 @@ import {InvoiceProvider} from "./src/contexts/InvoiceContext";
 import InvoiceViewOrEdit from "./src/views/InvoiceViewOrEdit";
 
 const InvoiceContainer = () => {
+    useEffect(() => {
+        const login = document.querySelector('body.logged-in');
+        if(!login) location.href = '/auth/sign-out';
+    }, [])
     return (
         <div>
             <SettingsProvider>
