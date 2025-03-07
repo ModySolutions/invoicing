@@ -10,7 +10,7 @@ const InvoiceFormDetails = () => {
     const {invoice, setInvoice} = useInvoice();
     const {settings} = useSettings();
     const [issuedDate, setIssuedDate] = useState(invoice?.invoice_issue_date);
-    const [invoiceSender, setInvoiceSender] = useState([
+    const [invoiceSender, setInvoiceSender] = useState(invoice?.invoice_sender ?? [
         settings?.invoice_business_fni.toString().toUpperCase(),
         capitalize(settings?.invoice_business_name.toString()),
         capitalize([
@@ -48,6 +48,10 @@ const InvoiceFormDetails = () => {
 
         if(name === 'invoice_sender') {
             setInvoiceSender(value);
+            setInvoice(prevState => ({
+                ...prevState,
+                ['invoice_sender_address']: value,
+            }));
         }
 
         if(name === 'invoice_client') {
