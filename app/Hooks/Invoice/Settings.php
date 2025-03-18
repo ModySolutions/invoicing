@@ -17,9 +17,6 @@ class Settings {
     }
 
     public static function get_settings() : array {
-        $custom_logo_id = get_theme_mod('custom_logo');
-        $custom_logo = $custom_logo_id ?
-            wp_get_attachment_image_src($custom_logo_id, 'full', true)[0] : null;
         return array(
             'invoice_last_number' => get_option('invoice_last_number', 0),
             'invoice_series' => get_option('invoice_series', array()),
@@ -37,7 +34,7 @@ class Settings {
             'invoice_discounts' => get_option('invoice_discounts', array()),
             'invoice_currency' => get_option('invoice_currency', 'EUR'),
             'invoice_currency_symbol' => get_option('invoice_currency_symbol', '&euro;'),
-            'invoice_logo' => $custom_logo,
+            'invoice_logo' => \Invoice\Features\Settings::get_logo(),
             'spain_iva' => get_option('spain_iva'),
             'spain_irpf' => get_option('spain_irpf'),
             'selected_invoice_tax' => get_option('selected_invoice_tax', 21),

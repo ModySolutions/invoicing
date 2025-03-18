@@ -6,7 +6,7 @@ use Invoice\Hooks\Invoice\Post;
 use Invoice\Hooks\Invoice\Settings;
 
 class Plugin {
-    const last_update = 'Rare|Rear|Peter|Savage';
+    const last_update = 'Hipe|Tinky|Margarita|Airwalk';
     public static function init() : void {
         add_action('init', self::wp_init(...));
         add_action('wp_enqueue_scripts', self::wp_enqueue_scripts(...), 100);
@@ -19,17 +19,35 @@ class Plugin {
             if(!$invoice_page_id) {
                 $invoice_page_id = wp_insert_post(array(
                     'post_type' => 'page',
-                    'post_title' => __('Invoices'),
+                    'post_title' => __('Invoices', APP_THEME_LOCALE),
                     'post_status' => 'publish',
                     'post_author' => 1,
                     'post_name' => 'invoices',
-                    'post_content' => APP_INVOICE_BLOCK_CONTENT
+                    'post_content' => APP_INVOICE_BLOCK_CONTENT,
+                ));
+            }
+
+            $invoice_print_page_id = get_option('invoice_print_page_id');
+            if(!$invoice_print_page_id) {
+                $invoice_print_page_id = wp_insert_post(array(
+                    'post_type' => 'page',
+                    'post_title' => __('Print invoice', APP_THEME_LOCALE),
+                    'post_status' => 'publish',
+                    'post_author' => 1,
+                    'post_name' => 'print-invoice',
+                    'post_content' => APP_INVOICE_BLOCK_CONTENT,
                 ));
             }
 
             wp_update_post(array(
                 'ID' => $invoice_page_id,
-                'post_content' => APP_INVOICE_BLOCK_CONTENT
+                'post_content' => APP_INVOICE_BLOCK_CONTENT,
+            ));
+
+            wp_update_post(array(
+                'ID' => $invoice_print_page_id,
+                'post_content' => APP_INVOICE_BLOCK_CONTENT,
+                'page_template' => APP_INVOICE_DIR . '/resources/templates/print-invoice-template.php',
             ));
 
             $invoice_routes = array(
@@ -75,6 +93,7 @@ class Plugin {
             update_option('spain_iva', $spain_iva);
             update_option('spain_irpf', $spain_irpf);
             update_option('invoice_page_id', $invoice_page_id);
+            update_option('invoice_print_page_id', $invoice_print_page_id);
             update_option('invoice_option_last_update', self::last_update);
             flush_rewrite_rules();
         }
@@ -82,7 +101,9 @@ class Plugin {
 
     public static function wp_enqueue_scripts() : void {
         $app_file = APP_INVOICE_DIR . '/dist/invoice.asset.php';
-        if(is_file($app_file) && is_page('invoices') || get_post_type() === 'invoice') {
+        if(is_file($app_file) &&
+            (is_page('invoices') || is_page('print-invoice')) ||
+            get_post_type() === 'invoice') {
            $app_assets = include $app_file;
            wp_register_script(
                'app-invoice',
@@ -106,16 +127,20 @@ class Plugin {
                'app-invoice',
                APP_INVOICE_DIR_URL . 'dist/invoice.css',
                [],
-               $app_assets['version']
-           );
-
-           wp_enqueue_style(
-               'app-invoice-print',
-               APP_INVOICE_DIR_URL . 'dist/print.css',
-               [],
                $app_assets['version'],
-               'print'
+               'all'
            );
+        }
+
+        if(is_file($app_file) && is_page('print-invoice')) {
+            $app_assets = include $app_file;
+            wp_enqueue_style(
+                'app-invoice-print',
+                APP_INVOICE_DIR_URL . 'dist/print.css',
+                [],
+                $app_assets['version'],
+                'print'
+            );
         }
     }
 }

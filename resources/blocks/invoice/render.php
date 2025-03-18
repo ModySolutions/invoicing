@@ -1,1 +1,1 @@
-<div id="app-invoice-container"></div>
+<div id="app-invoice-container" class='app-invoice-container'></div>

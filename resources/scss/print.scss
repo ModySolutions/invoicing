@@ -1,17 +1,5 @@
-aside {
-  display: none !important;
-}
-.sidebar {
-  display: none !important;
-}
-
-.invoice {
-  &-panel {
-    width: 100%;
-    min-width: 760px;
-    .form-container {
-      width: 100%;
-      grid-template-columns: 1fr !important;
-    }
+body.print-invoice {
+  .sidebar {
+    display: none !important;
   }
 }

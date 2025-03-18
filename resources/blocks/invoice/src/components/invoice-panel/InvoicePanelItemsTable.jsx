@@ -14,8 +14,7 @@ const InvoicePanelItemsTable = () => {
         'item_total': '0',
     };
 
-    useEffect(() => {
-    }, [invoice])
+    useEffect(() => {}, [invoice])
     return (
         <table className='invoices-table inverse'>
             <InvoiceItemsTableHeader />
