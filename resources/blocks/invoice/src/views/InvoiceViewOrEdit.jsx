@@ -6,15 +6,18 @@ import InvoicePanel from "../components/InvoicePanel";
 import {useInvoice} from "../contexts/InvoiceContext";
 import InvoiceForm from "../components/InvoiceForm";
 
-const InvoiceViewOrEdit = ({action, print}) => {
+const InvoiceViewOrEdit = ({action, print, pub}) => {
     const {uuid} = useParams();
     const {invoice, setInvoice, invoiceUuid, setInvoiceUuid, setFetchNewInvoice} = useInvoice()
+    const [invoiceAction, setInvoiceAction] = useState(location.href.includes('public') ? 'public' : '');
     const [loading,setLoading] = useState(true);
 
     useEffect(() => {
         setInvoiceUuid(uuid);
+        console.log(uuid, invoiceAction)
         if(uuid !== invoiceUuid) {
-            apiFetch({path: `invoice/v1/invoice/${uuid}`})
+            const url = invoiceAction === 'public' ? `invoice/v1/invoice/public/${uuid}` : `invoice/v1/invoice/${uuid}`
+            apiFetch({path: url})
             .then(response => {
                 setInvoice(response);
                 setInvoiceUuid(response?.UUID)
@@ -35,7 +38,7 @@ const InvoiceViewOrEdit = ({action, print}) => {
         <>
             {
                 !loading && invoiceUuid ?
-                action === 'view' ? <InvoicePanel print={print} /> : <InvoiceForm /> :
+                action === 'view' ? <InvoicePanel print={print} pub={pub} /> : <InvoiceForm /> :
                 <em>{__('Loading', 'app')}</em>
             }
         </>

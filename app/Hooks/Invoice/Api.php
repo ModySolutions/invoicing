@@ -34,6 +34,13 @@ class Api {
                 }
             ));
         register_rest_route('invoice/v1',
+            '/invoice/public/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})',
+            array(
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => self::get_public_invoice(...),
+                'permission_callback' => '__return_true',
+            ));
+        register_rest_route('invoice/v1',
             '/invoice/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})', array(
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => self::update_invoice(...),
@@ -133,6 +140,21 @@ class Api {
                 'uuid', $uuid));
 
         return rest_ensure_response(Meta::schema($invoice->id));
+    }
+
+    public static function get_public_invoice(\WP_REST_Request $request): \WP_REST_Response {
+        $uuid = $request->get_param('uuid');
+        if (!$uuid) {
+            return rest_ensure_response(array());
+        }
+
+        $uuid = sanitize_text_field($uuid);
+        global $wpdb;
+        $invoice =
+            $wpdb->get_row($wpdb->prepare("SELECT post_id as id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
+                'uuid', $uuid));
+
+        return rest_ensure_response(Meta::schema($invoice->id, true));
     }
 
     public static function new_invoice(\WP_REST_Request $request) : \WP_REST_Response {
