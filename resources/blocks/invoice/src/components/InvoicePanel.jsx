@@ -9,6 +9,7 @@ import InvoicePanelNotesAndTerms from "./invoice-panel/InvoicePanelNotesAndTerms
 import InvoicePanelSidebar from "./invoice-panel/InvoicePanelSidebar";
 import InvoiceTotals from "./invoice-common/InvoiceTotals";
 import InvoicePanelLoading from "./invoice-panel/InvoicePanelLoading";
+import InvoicePanelBottomBar from "./invoice-panel/InvoicePanelBottomBar";
 
 const InvoicePanelContainer = ({print}) => {
     return (
@@ -52,24 +53,15 @@ const InvoicePanel = ({print}) => {
         };
     }, []);
 
-    if(print) {
-        setTimeout(() => {
-            const element = () => document.getElementById(`print-invoice-${invoice?.UUID}`)
-            generatePDF(element, {
-                method: 'open',
-                resolution: Resolution.HIGH,
-            }).then(() => window.close());
-        }, 1000);
-    }
-
     return (
         <div className={'invoice-form invoice-panel mt-3 mb-5 p-relative'}>
-            <div id={`print-invoice-${invoice?.UUID}`} style={print ? {maxWidth: '800px', margin: '0 auto'} : {}}
+            <div id={`print-invoice-${invoice?.UUID}${print ? '-print' : ''}`}
+                 style={print ? {maxWidth: '800px', margin: '0 auto'} : {}}
                  className={`${!print ? 'grid grid-cols-7-3' : ''} form-container p-relative`}>
                 <InvoicePanelContainer print={print}/>
                 {!print && <InvoicePanelSidebar/>}
             </div>
-            {print && <InvoicePanelLoading />}
+            {print && <InvoicePanelBottomBar/>}
         </div>
     )
 }
