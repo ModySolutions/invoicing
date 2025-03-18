@@ -72,7 +72,7 @@ jobs:
 
       - name: 📂 Sync files to VPS using SSH
         run: |
-          rsync -e "ssh -o StrictHostKeyChecking=no" -avz --no-times --exclude='node_modules' --exclude='.git*' --exclude='composer.lock' --exclude='package.json'  --exclude='pnpm*' --exclude='resources' ./* ${{ vars.SSH_USER_SERVER }}:${{ vars.TARGET_DIR }} --verbose
+          rsync -e "ssh -o StrictHostKeyChecking=no" -avz --no-times --exclude='node_modules' --exclude='.git*' --exclude='composer.lock' --exclude='package.json'  --exclude='pnpm*' --exclude='resources/blocks' --exclude='resources/scripts' --exclude='resources/scss' ./* ${{ vars.SSH_USER_SERVER }}:${{ vars.TARGET_DIR }} --verbose
         env:
           TARGET_DIR: ${{ vars.TARGET_DIR }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
