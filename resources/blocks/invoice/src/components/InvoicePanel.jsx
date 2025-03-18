@@ -42,7 +42,7 @@ const InvoicePanel = ({print, pub}) => {
     return (
         <div className={'invoice-form invoice-panel mt-3 mb-5 p-relative'}>
             <div id={`print-invoice-${invoice?.UUID}${print ? '-print' : ''}`}
-                 style={print || pub ? {width: 800, margin: '0 auto'} : {}}
+                 style={print || pub ? {maxWidth: 800, margin: '0 auto'} : {}}
                  className={`${!print && !pub ? 'grid grid-cols-7-3' : ''} form-container p-relative`}>
                 <InvoicePanelContainer print={print} pub={pub}/>
                 {!print && !pub && <InvoicePanelSidebar/>}
