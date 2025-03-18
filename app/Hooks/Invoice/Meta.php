@@ -149,7 +149,7 @@ class Meta {
             'invoice_edit_url' => $invoice_edit_url,
             'invoice_notes' => get_field('invoice_notes', $invoice_id),
             'invoice_terms' => get_field('invoice_terms', $invoice_id),
-            'invoice_logo' => get_field('invoice_logo', $invoice_id),
+            'invoice_logo' => \Invoice\Features\Settings::get_logo($invoice_id),
         );
     }
 }

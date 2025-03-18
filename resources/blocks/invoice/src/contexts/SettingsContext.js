@@ -23,9 +23,10 @@ export const SettingsProvider = ({children}) => {
         setEuropeCountries(allCountries.filter(country => EuropeCountries.includes(country.name)));
         apiFetch({path: `/wp/v2/pages/${Invoice.invoice_page_id}`})
         .then(page => {
+            const sidebar = document.getElementById('dynamic-sidebar-nav');
             if (page?.routes) {
                 const nav = createRoot(
-                    document.getElementById('dynamic-sidebar-nav')
+                    sidebar
                 )
                 nav.render(<Links routes={page.routes}/>);
             }

@@ -241,6 +241,9 @@ class Api {
         }
 
         foreach ($data['acf'] as $key => $value) {
+            if($key == 'invoice_logo') {
+                $value = \Invoice\Features\Settings::get_logo();
+            }
             update_field($key, $value, $invoice_id);
         }
 

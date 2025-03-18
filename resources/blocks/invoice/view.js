@@ -29,6 +29,7 @@ const InvoiceContainer = () => {
                                 <Route path='/invoices/new' element={<InvoiceNew/>}/>
                                 <Route path='/invoices/edit/:uuid' element={<InvoiceViewOrEdit action='edit'/>}/>
                                 <Route path='/invoices/view/:uuid' element={<InvoiceViewOrEdit action='view'/>}/>
+                                <Route path='/invoices/print/:uuid' element={<InvoiceViewOrEdit action='view' print={true }/>}/>
                                 <Route path='/invoices/business' element={<Business/>}/>
                                 <Route path='/invoices/settings' element={<Settings/>}/>
                             </Routes>

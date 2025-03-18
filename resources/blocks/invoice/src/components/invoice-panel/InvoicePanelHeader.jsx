@@ -8,7 +8,7 @@ import DropFileInput from "../DropFileInput";
 const InvoicePanelHeader = () => {
     const {invoice} = useInvoice();
     const {settings} = useSettings();
-    const [logo] = useState(invoice?.logo ?? settings?.invoice_logo);
+    const [logo] = useState(invoice?.invoice_logo ?? settings?.invoice_logo);
     const [invoiceUrl] = useState(window.location.href);
 
     return (

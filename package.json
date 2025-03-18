@@ -36,6 +36,7 @@
     "react-datepicker": "^7.6.0",
     "react-input-mask": "^2.0.4",
     "react-router-dom": "^7.1.1",
+    "react-to-pdf": "^1.0.1",
     "react-toastify": "^11.0.2",
     "sass-loader": "^16.0.4",
     "scss-loader": "^0.0.1",
