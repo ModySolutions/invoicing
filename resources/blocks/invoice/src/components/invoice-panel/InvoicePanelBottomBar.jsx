@@ -5,17 +5,13 @@ import {useInvoice} from "../../contexts/InvoiceContext";
 
 const InvoicePanelToPDFButton = () => {
     const {invoice} = useInvoice();
-    const printPDF = (event) => {
+    const printPDF = async (event) => {
         event.preventDefault();
         const element = () => document.getElementById(`print-invoice-${invoice?.UUID}-print`)
-        generatePDF(element, {
-            method: 'open',
-            resolution: Resolution.HIGH,
-        }).then(() => {
-            setTimeout(() => {
-                window.close();
-            }, 500);
-        });
+        const { pdf } = await generatePDF(element, {resolution: Resolution.HIGH}).then(r => console.log(r));
+        console.log(pdf);
+        const blob = new Blob(invoice?.UUID, pdf, {type: 'application/pdf'})
+        window.location.href = URL.createObjectURL(blob);
     }
     return (
         <a href='#'
