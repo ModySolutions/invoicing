@@ -11,7 +11,11 @@ const InvoicePanelToPDFButton = () => {
         generatePDF(element, {
             method: 'open',
             resolution: Resolution.HIGH,
-        }).then((r) => console.log(r));
+        }).then(() => {
+            setTimeout(() => {
+                window.close();
+            }, 500);
+        });
     }
     return (
         <a href='#'
