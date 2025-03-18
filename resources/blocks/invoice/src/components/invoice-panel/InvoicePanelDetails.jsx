@@ -5,7 +5,7 @@ import {formatDate} from "@invoice/tools/DateFormats";
 import {useInvoice} from "../../contexts/InvoiceContext";
 import {useSettings} from "../../contexts/SettingsContext";
 
-const InvoicePanelDetails = () => {
+const InvoicePanelDetails = ({pub}) => {
     const {invoice} = useInvoice();
     const {settings} = useSettings();
     const [issuedDate] = useState(invoice?.invoice_issue_date ?? new Date());
@@ -25,11 +25,16 @@ const InvoicePanelDetails = () => {
                     <span dangerouslySetInnerHTML={{__html: nl2br(invoice?.invoice_sender ?? '')}}/>
                 </div>
                 <div className='client w-100-p mt-3'>
-                    <label htmlFor='client' className={'d-block'}>
-                        {__('Invoice to:', 'app')}
-                    </label>
-                    <span className={'capitalize'}
-                          dangerouslySetInnerHTML={{__html: nl2br(invoice?.invoice_client ?? '')}}/>
+                    {!pub &&
+                        <>
+                            <label htmlFor='client' className={'d-block'}>
+                                {__('Invoice to:', 'app')}
+                            </label>
+                            <span className={'capitalize'}
+                                  dangerouslySetInnerHTML={{__html: nl2br(invoice?.invoice_client ?? '')}}/>
+                        </>
+                    }
+
                 </div>
             </div>
             <div className='right flex flex-column justify-end mt-3'>

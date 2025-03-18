@@ -9,7 +9,7 @@ const InvoicePanelHeader = () => {
     const {invoice} = useInvoice();
     const {settings} = useSettings();
     const [logo] = useState(invoice?.invoice_logo ?? settings?.invoice_logo);
-    const [invoiceUrl] = useState(window.location.href);
+    const [invoiceUrl] = useState(window.location.href.toString().replace('/view/', '/public/'));
 
     return (
         <div className='grid grid-cols-7-3 invoice-header gap-3'>

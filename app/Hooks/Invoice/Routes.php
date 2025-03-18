@@ -21,6 +21,12 @@ class Routes {
             'index.php?pagename=print-invoice&uuid=$matches[1]',
             'top'
         );
+
+        add_rewrite_rule(
+            'invoices/public/([^/]+)/?$',
+            'index.php?pagename=print-invoice&uuid=$matches[1]&invoice_action=public',
+            'top'
+        );
     }
 
     public static function query_vars(array $vars): array {

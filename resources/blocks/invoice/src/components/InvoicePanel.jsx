@@ -8,18 +8,17 @@ import InvoicePanelItemsTable from "./invoice-panel/InvoicePanelItemsTable";
 import InvoicePanelNotesAndTerms from "./invoice-panel/InvoicePanelNotesAndTerms";
 import InvoicePanelSidebar from "./invoice-panel/InvoicePanelSidebar";
 import InvoiceTotals from "./invoice-common/InvoiceTotals";
-import InvoicePanelLoading from "./invoice-panel/InvoicePanelLoading";
 import InvoicePanelBottomBar from "./invoice-panel/InvoicePanelBottomBar";
 
-const InvoicePanelContainer = ({print}) => {
+const InvoicePanelContainer = ({pub}) => {
     return (
         <div className='form-container p-4 radius-lg rounded bg-white'>
             <InvoicePanelHeader/>
-            <InvoicePanelDetails/>
+            <InvoicePanelDetails pub={pub}/>
             <div className='mt-4 invoices-table-container'>
                 <InvoicePanelItemsTable/>
                 <div className='grid grid-cols-6-4 mt-5'>
-                    <InvoicePanelNotesAndTerms/>
+                    <InvoicePanelNotesAndTerms pub={pub}/>
                     <InvoiceTotals/>
                 </div>
             </div>
@@ -27,20 +26,7 @@ const InvoicePanelContainer = ({print}) => {
     )
 }
 
-const PrintPDF = () => {
-    const {invoice} = useInvoice();
-    return(
-        <div id={invoice?.uuid} className={'invoice-form invoice-panel mt-3 mb-5 p-relative'}>
-            <div style={print ? {maxWidth: '800px', margin: '0 auto'} : {}}
-                 className={`${!print ? 'grid grid-cols-7-3' : ''} form-container p-relative`}>
-                <InvoicePanelContainer print={print}/>
-                {!print && <InvoicePanelSidebar/>}
-            </div>
-        </div>
-    )
-}
-
-const InvoicePanel = ({print}) => {
+const InvoicePanel = ({print, pub}) => {
     const {invoice} = useInvoice();
     const [currentPath, setCurrentPath] = useState(window.location.path);
 
@@ -56,10 +42,10 @@ const InvoicePanel = ({print}) => {
     return (
         <div className={'invoice-form invoice-panel mt-3 mb-5 p-relative'}>
             <div id={`print-invoice-${invoice?.UUID}${print ? '-print' : ''}`}
-                 style={print ? {maxWidth: '800px', margin: '0 auto'} : {}}
-                 className={`${!print ? 'grid grid-cols-7-3' : ''} form-container p-relative`}>
-                <InvoicePanelContainer print={print}/>
-                {!print && <InvoicePanelSidebar/>}
+                 style={print || pub ? {width: 800, margin: '0 auto'} : {}}
+                 className={`${!print && !pub ? 'grid grid-cols-7-3' : ''} form-container p-relative`}>
+                <InvoicePanelContainer print={print} pub={pub}/>
+                {!print && !pub && <InvoicePanelSidebar/>}
             </div>
             {print && <InvoicePanelBottomBar/>}
         </div>

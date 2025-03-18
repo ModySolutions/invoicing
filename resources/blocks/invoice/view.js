@@ -16,7 +16,10 @@ import InvoiceViewOrEdit from "./src/views/InvoiceViewOrEdit";
 const InvoiceContainer = () => {
     useEffect(() => {
         const login = document.querySelector('body.logged-in');
-        if(!login) location.href = '/auth/sign-out';
+        const allowed = ['invoices/public']
+        const currentLocation = location.href;
+        const isAllowed = allowed.some(route => currentLocation.includes(route));
+        if(!login && !isAllowed) location.href = '/auth/sign-out';
     }, [])
     return (
         <div>
@@ -29,7 +32,8 @@ const InvoiceContainer = () => {
                                 <Route path='/invoices/new' element={<InvoiceNew/>}/>
                                 <Route path='/invoices/edit/:uuid' element={<InvoiceViewOrEdit action='edit'/>}/>
                                 <Route path='/invoices/view/:uuid' element={<InvoiceViewOrEdit action='view'/>}/>
-                                <Route path='/invoices/print/:uuid' element={<InvoiceViewOrEdit action='view' print={true }/>}/>
+                                <Route path='/invoices/print/:uuid' element={<InvoiceViewOrEdit action='view' print={true}/>}/>
+                                <Route path='/invoices/public/:uuid' element={<InvoiceViewOrEdit action='view' pub={true}/>}/>
                                 <Route path='/invoices/business' element={<Business/>}/>
                                 <Route path='/invoices/settings' element={<Settings/>}/>
                             </Routes>
