@@ -1,0 +1,10 @@
+{
+	"preset": "per",
+	"exclude": [
+		"blocks",
+		"vendor",
+		"dist",
+		"node_modules",
+		"resources"
+	]
+}
