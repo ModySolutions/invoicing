@@ -2,25 +2,30 @@
 
 namespace Invoice\Hooks\Invoice;
 
+use Invoice\Features\Schema;
+use Invoice\Features\Settings;
+
 class Api {
-    public static function register_rest_route(): void {
+    use Settings;
+    use Schema;
+    public function register_rest_route(): void {
         register_rest_route('invoice/v1', '/settings/', array(
             'methods' => \WP_REST_Server::READABLE,
-            'callback' => self::get_settings(...),
+            'callback' => array($this, 'get_settings_route'),
             'permission_callback' => function () {
                 return is_user_logged_in();
             }
         ));
         register_rest_route('invoice/v1', '/settings/business', array(
             'methods' => \WP_REST_Server::EDITABLE,
-            'callback' => self::save_business_settings(...),
+            'callback' => array($this, 'save_business_settings_route'),
             'permission_callback' => function () {
                 return current_user_can('manage_options');
             }
         ));
         register_rest_route('invoice/v1', '/settings/invoice', array(
             'methods' => \WP_REST_Server::EDITABLE,
-            'callback' => self::save_invoice_settings(...),
+            'callback' => array($this, 'save_invoice_settings_route'),
             'permission_callback' => function () {
                 return current_user_can('manage_options');
             }
@@ -28,7 +33,7 @@ class Api {
         register_rest_route('invoice/v1',
             '/invoice/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})', array(
                 'methods' => \WP_REST_Server::READABLE,
-                'callback' => self::get_invoice(...),
+                'callback' => array($this, 'get_invoice_route'),
                 'permission_callback' => function () {
                     return current_user_can('manage_options');
                 }
@@ -37,13 +42,13 @@ class Api {
             '/invoice/public/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})',
             array(
                 'methods' => \WP_REST_Server::READABLE,
-                'callback' => self::get_public_invoice(...),
+                'callback' => array($this, 'get_public_invoice_route'),
                 'permission_callback' => '__return_true',
             ));
         register_rest_route('invoice/v1',
             '/invoice/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})', array(
                 'methods' => \WP_REST_Server::CREATABLE,
-                'callback' => self::update_invoice(...),
+                'callback' => array($this, 'update_invoice_route'),
                 'permission_callback' => function () {
                     return current_user_can('manage_options');
                 }
@@ -52,40 +57,40 @@ class Api {
             '/invoice/status/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})',
             array(
                 'methods' => \WP_REST_Server::CREATABLE,
-                'callback' => self::update_invoice_status(...),
+                'callback' => array($this, 'update_invoice_status_route'),
                 'permission_callback' => function () {
                     return current_user_can('manage_options');
                 }
             ));
         register_rest_route('invoice/v1', '/invoice/new-invoice', array(
             'methods' => \WP_REST_Server::CREATABLE,
-            'callback' => self::new_invoice(...),
+            'callback' => array($this, 'new_invoice_route'),
             'permission_callback' => function () {
                 return current_user_can('manage_options');
             }
         ));
         register_rest_route('invoice/v1', '/invoice/', array(
             'methods' => \WP_REST_Server::CREATABLE,
-            'callback' => self::create_invoice(...),
+            'callback' => array($this, 'create_invoice_route'),
             'permission_callback' => function () {
                 return current_user_can('manage_options');
             }
         ));
     }
 
-    public static function get_settings(\WP_REST_Request $request): \WP_REST_Response {
-        return rest_ensure_response(Settings::get_settings());
+    public function get_settings_route(\WP_REST_Request $request): \WP_REST_Response {
+        return rest_ensure_response($this->get_settings());
     }
 
-    public static function save_business_settings(\WP_REST_Request $request): \WP_REST_Response {
+    public function save_business_settings_route(\WP_REST_Request $request): \WP_REST_Response {
         $fields = $request->get_params();
-        $required_fields = self::_set_business_settings_fields_labels();
+        $required_fields = $this->_set_business_settings_fields_labels();
         extract(app_validate_required($required_fields, $fields));
 
         $data = array();
         if ($success) {
             $insert_fields = array_merge($required_fields, array(
-                'invoice_business_address_cont' => __('Address <small>(cont)</small>')
+                'invoice_business_address_cont' => __('Address <small>(cont)</small>', APP_THEME_LOCALE),
             ));
 
             foreach ($insert_fields as $field => $label) {
@@ -104,9 +109,9 @@ class Api {
         ));
     }
 
-    public static function save_invoice_settings(\WP_REST_Request $request): \WP_REST_Response {
+    public function save_invoice_settings_route(\WP_REST_Request $request): \WP_REST_Response {
         $fields = $request->get_params();
-        $required_fields = self::_set_invoice_settings_fields_labels();
+        $required_fields = $this->_set_invoice_settings_fields_labels();
         extract(app_validate_required($required_fields, $fields));
 
         $data = array();
@@ -117,7 +122,7 @@ class Api {
                 $data[$field] = $fields[$field];
             }
 
-            $message = __('Your invoice settings were saved successfully.');
+            $message = __('Your invoice settings were saved successfully.', APP_THEME_LOCALE);
         }
 
         return rest_ensure_response(array(
@@ -127,7 +132,7 @@ class Api {
         ));
     }
 
-    public static function get_invoice(\WP_REST_Request $request): \WP_REST_Response {
+    public function get_invoice_route(\WP_REST_Request $request): \WP_REST_Response {
         $uuid = $request->get_param('uuid');
         if (!$uuid) {
             return rest_ensure_response(array());
@@ -139,10 +144,10 @@ class Api {
             $wpdb->get_row($wpdb->prepare("SELECT post_id as id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
                 'uuid', $uuid));
 
-        return rest_ensure_response(Meta::schema($invoice->id));
+        return rest_ensure_response($this->schema($invoice->id));
     }
 
-    public static function get_public_invoice(\WP_REST_Request $request): \WP_REST_Response {
+    public function get_public_invoice_route(\WP_REST_Request $request): \WP_REST_Response {
         $uuid = $request->get_param('uuid');
         if (!$uuid) {
             return rest_ensure_response(array());
@@ -154,25 +159,25 @@ class Api {
             $wpdb->get_row($wpdb->prepare("SELECT post_id as id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
                 'uuid', $uuid));
 
-        return rest_ensure_response(Meta::schema($invoice->id, true));
+        return rest_ensure_response($this->schema($invoice->id, true));
     }
 
-    public static function new_invoice(\WP_REST_Request $request) : \WP_REST_Response {
+    public function new_invoice_route(\WP_REST_Request $request) : \WP_REST_Response {
         $invoice_id = wp_insert_post(array(
             'post_title' => __('Draft', APP_THEME_LOCALE),
             'post_type' => APP_INVOICE_POST_TYPE,
         ));
         return rest_ensure_response(
-            self::_update_invoice(
+            $this->_update_invoice(
                 $invoice_id,
                 $request->get_params()
             )
         );
     }
 
-    public static function create_invoice(\WP_REST_Request $request): \WP_REST_Response {
+    public function create_invoice_route(\WP_REST_Request $request): \WP_REST_Response {
         $data = $request->get_params();
-        $form_validation = self::_validate_invoice_data($data['acf'], null);
+        $form_validation = $this->_validate_invoice_data($data['acf'], null);
         if (!$form_validation['success']) {
             return rest_ensure_response(array(
                 'success' => $form_validation['success'],
@@ -188,7 +193,7 @@ class Api {
         return rest_ensure_response(self::_update_invoice($invoice_id, $data));
     }
 
-    public static function update_invoice(\WP_REST_Request $request): \WP_REST_Response {
+    public function update_invoice_route(\WP_REST_Request $request): \WP_REST_Response {
         $uuid = $request->get_param('uuid');
         if (!$uuid) {
             return rest_ensure_response(array());
@@ -220,7 +225,7 @@ class Api {
         return rest_ensure_response(self::_update_invoice($invoice_id, $data));
     }
 
-    public static function update_invoice_status(\WP_REST_Request $request) : \WP_REST_Response {
+    public function update_invoice_status_route(\WP_REST_Request $request) : \WP_REST_Response {
         $uuid = $request->get_param('uuid');
         if (!$uuid) {
             return rest_ensure_response(array());
@@ -251,7 +256,7 @@ class Api {
         ));
     }
 
-    private static function _update_invoice(int $invoice_id, array $data): array {
+    private function _update_invoice(int $invoice_id, array $data): array {
         global $wpdb;
         $invoice_data = get_post($invoice_id);
 
@@ -264,7 +269,7 @@ class Api {
 
         foreach ($data['acf'] as $key => $value) {
             if($key == 'invoice_logo') {
-                $value = \Invoice\Features\Settings::get_logo();
+                $value = $this->get_logo();
             }
             update_field($key, $value, $invoice_id);
         }
@@ -275,10 +280,10 @@ class Api {
             'message' => __('Invoice updated successfully', APP_THEME_LOCALE),
             'success' => true,
             'invoice_last_number' => $invoice_last_number,
-        ), Meta::schema($invoice_id));
+        ), $this->schema($invoice_id));
     }
 
-    private static function _validate_invoice_data(array $data, ?int $invoice_id): array {
+    private function _validate_invoice_data(array $data, ?int $invoice_id): array {
         $required = array(
             'invoice_number' => __('Invoice number', APP_THEME_LOCALE),
             'invoice_issue_date' => __('Issue date', APP_THEME_LOCALE),
@@ -335,7 +340,7 @@ class Api {
         return array('success' => true);
     }
 
-    private static function _set_business_settings_fields_labels(): array {
+    private function _set_business_settings_fields_labels(): array {
         return array(
             'invoice_business_fni_country_code' => __('Country code', APP_THEME_LOCALE),
             'invoice_business_fni' => __('Fiscal Identification Number', APP_THEME_LOCALE),
@@ -350,7 +355,7 @@ class Api {
         );
     }
 
-    private static function _maybe_update_invoice_last_number(string $invoice_number): string {
+    private function _maybe_update_invoice_last_number(string $invoice_number): string {
         $invoice_last_number = get_option('invoice_last_number');
         if ($invoice_number > $invoice_last_number) {
             update_option('invoice_last_number', $invoice_number);
@@ -359,7 +364,7 @@ class Api {
         return $invoice_last_number;
     }
 
-    private static function _set_invoice_settings_fields_labels(): array {
+    private function _set_invoice_settings_fields_labels(): array {
         return array(
             'invoice_last_number' => __('Last invoice number', APP_THEME_LOCALE),
             'invoice_date_format' => __('Date format', APP_THEME_LOCALE),

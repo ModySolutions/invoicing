@@ -2,15 +2,17 @@
 
 namespace Invoice\Hooks\Invoice;
 
+use Invoice\Features\Schema;
 use function Env\env;
 
 class Meta {
-    public static function register_rest_field(): void {
-        register_rest_field('invoice', 'invoice_date', self::invoice_date(...));
-        register_rest_field('invoice', 'invoice_number', self::invoice_number(...));
+    use Schema;
+    public function register_rest_field(): void {
+        register_rest_field('invoice', 'invoice_date', array($this, 'invoice_date'));
+        register_rest_field('invoice', 'invoice_number', array($this, 'invoice_number'));
     }
 
-    public static function invoice_date(): array {
+    public function invoice_date(): array {
         return array(
             'get_callback' => function (array $invoice): string {
                 return get_post_meta($invoice['id'], 'invoice_date', true);
@@ -22,7 +24,7 @@ class Meta {
         );
     }
 
-    public static function invoice_number() : array {
+    public  function invoice_number() : array {
         return array(
             'get_callback'    => function (array $invoice) {
                 return get_post_meta($invoice['id'], 'invoice_number', true);
@@ -62,20 +64,20 @@ class Meta {
         );
     }
 
-    public static function rest_prepare_invoice(
+    public function rest_prepare_invoice(
         \WP_REST_Response $response,
         \WP_Post $invoice,
         \WP_REST_Request $request
     ): \WP_REST_Response {
         if ('invoice' === $invoice->post_type) {
             $invoice_id = $invoice->ID;
-            $response->data = self::schema($invoice_id);
+            $response->data = $this->schema($invoice_id);
         }
 
         return $response;
     }
 
-    public static function rest_prepare_status(
+    public  function rest_prepare_status(
         \WP_REST_Response $response,
         object $post_status,
         \WP_REST_Request $request
@@ -98,64 +100,5 @@ class Meta {
         ));
 
         return $response;
-    }
-
-    public static function schema($invoice_id, $public = false) : array {
-        $stored_invoice_series_number = get_field('invoice_series_number', $invoice_id);
-        $stored_invoice_number = get_field('invoice_number', $invoice_id);
-        $invoice_number = '';
-        if($stored_invoice_series_number) {
-            $invoice_number = "{$stored_invoice_number}-";
-        }
-        $invoice_number .= $stored_invoice_number;
-        $invoice_number = $stored_invoice_number === 99999 ? null : $invoice_number;
-        $uuid = get_post_meta($invoice_id, 'uuid', true);
-        $invoice_view_url = "/invoices/view/{$uuid}";
-        $invoice_edit_url = "/invoices/edit/{$uuid}";
-
-        $private_data = array(
-            'invoice_client' => get_field('invoice_client', $invoice_id, false),
-            'invoice_client_address' => get_field('invoice_client_address', $invoice_id, false),
-            'invoice_view_url' => $invoice_view_url,
-            'invoice_edit_url' => $invoice_edit_url,
-            'invoice_notes' => get_field('invoice_notes', $invoice_id),
-            'invoice_terms' => get_field('invoice_terms', $invoice_id),
-        );
-
-        $public_data = array(
-            'ID' => $invoice_id,
-            'UUID' => $uuid,
-            'invoice_series_number' => $stored_invoice_series_number,
-            'invoice_number' => $stored_invoice_number,
-            'generated_invoice_number' => $invoice_number,
-            'invoice_issue_date' => get_field(
-                'invoice_issue_date',
-                $invoice_id,
-                false
-            ),
-            'invoice_due_date' => get_field(
-                'invoice_due_date',
-                $invoice_id,
-                false
-            ),
-            'invoice_sender' => get_field('invoice_sender', $invoice_id, false),
-            'invoice_sender_address' => get_field('invoice_sender_address', $invoice_id, false),
-            'invoice_currency' => get_field('invoice_currency', $invoice_id, false),
-            'invoice_items' => get_field('invoice_items', $invoice_id),
-            'invoice_status' => get_post_status($invoice_id),
-            'invoice_tax_amount' => get_field('invoice_tax_amount', $invoice_id),
-            'invoice_taxes' => get_field('invoice_taxes', $invoice_id),
-            'invoice_discount_amount' => get_field('invoice_discount_amount', $invoice_id),
-            'invoice_discounts' => get_field('invoice_discounts', $invoice_id),
-            'invoice_subtotal' => get_field('invoice_subtotal', $invoice_id),
-            'invoice_tax_subtotal' => get_field('invoice_tax_subtotal', $invoice_id),
-            'invoice_taxes_total' => get_field('invoice_taxes_total', $invoice_id),
-            'invoice_discount_subtotal' => get_field('invoice_discount_subtotal', $invoice_id),
-            'invoice_discount_total' => get_field('invoice_discount_total', $invoice_id),
-            'invoice_total' => get_field('invoice_total', $invoice_id),
-            'invoice_logo' => \Invoice\Features\Settings::get_logo($invoice_id),
-        );
-
-        return $public ? $public_data : array_merge($public_data, $private_data);
     }
 }

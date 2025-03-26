@@ -3,7 +3,7 @@
 namespace Invoice\Hooks\Invoice;
 
 class Validation {
-    public static function acf_validate_value(
+    public function acf_validate_value(
         bool|string $valid,
         $value,
         array $field,

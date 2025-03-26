@@ -2,10 +2,9 @@
 
 namespace Invoice\Hooks\Invoice;
 
-use function Env\env;
-
 class Post {
-    public static function register_post_type(): void {
+    use \Invoice\Features\Post;
+    public function register_post_type(): void {
         $labels = array(
             'name' => __('Invoices'),
             'singular_name' => __('Invoice'),
@@ -58,59 +57,26 @@ class Post {
         ));
     }
 
-    public static function register_post_status(): void {
-        foreach (self::get_statuses_array() as $invoice_status => $data) {
+    public function register_post_status(): void {
+        foreach ($this->get_statuses_array() as $invoice_status => $data) {
             register_post_status($invoice_status, $data);
         }
     }
 
-    public static function post_submitbox_misc_actions(): void {
-        global $post;
-
-        if ($post->post_type == 'invoice') {
-            $options = '';
-            $label = '';
-
-            foreach (self::get_statuses_array() as $invoice_status => $data) {
-                $complete = '';
-                if ($post->post_status == $invoice_status) {
-                    $complete = 'selected=\"selected\"';
-                    $label = " {$data['label']}";
-                }
-                $options .= "<option value=\"{$invoice_status}\" $complete>{$data['label']}</option>";
-            }
-
-            echo <<<EOF
-<script>
-jQuery(document).ready(function($){
-    $("select#post_status").html('');
-    $("select#post_status").append('{$options}');
-    $("#post-status-display").text('{$label}');
-});
-</script>
-<style>
-  #publish {
-    display: none;
-  }
-</style>
-EOF;
-        }
-    }
-
-    public static function save_post_invoice(int $post_id, \WP_Post $post, bool $update): void {
+    public function save_post_invoice(int $post_id, \WP_Post $post, bool $update): void {
         global $wpdb;
         $uuid = get_post_meta($post_id, 'uuid', true);
         $invoice_number = get_field('invoice_number', $post_id);
         $wpdb->update($wpdb->posts, array(
-                'post_title' => "{$uuid}-{$invoice_number}",
-                'post_content' => APP_INVOICE_BLOCK_CONTENT,
-                'post_name' => get_post_meta($post_id, 'uuid', true),
-            ), array(
-                'ID' => $post_id
-            ));
+            'post_title' => "{$uuid}-{$invoice_number}",
+            'post_content' => APP_INVOICE_BLOCK_CONTENT,
+            'post_name' => get_post_meta($post_id, 'uuid', true),
+        ), array(
+            'ID' => $post_id
+        ));
     }
 
-    public static function _is_number_in_use(int $number) : bool {
+    public function _is_number_in_use(int $number) : bool {
         global $wpdb;
         $number_exists = true;
         while($number_exists) {
@@ -130,14 +96,14 @@ EOF;
         return $number_exists;
     }
 
-    public static function views_edit(array $views): array {
+    public function views_edit(array $views): array {
         global $post_type;
 
         if ($post_type == 'invoice') {
             $status_count = wp_count_posts('invoice');
 
             $current = array_key_exists('post_status', $_GET) ? sanitize_text_field($_GET['post_status']) : '';
-            foreach (self::get_statuses_array() as $status => $data) {
+            foreach ($this->get_statuses_array() as $status => $data) {
                 $draft_count = $status_count->{$status};
                 $class = $current === $status ? ' class="current"' : '';
                 $views[$status] = '<a href="'.
@@ -155,64 +121,7 @@ EOF;
         return $views;
     }
 
-    public static function acf_validate_invoice_number($valid, $value, $field, $input_name): bool {
+    public  function acf_validate_invoice_number($valid, $value, $field, $input_name): bool {
         return $valid;
-    }
-
-    public static function get_statuses_array(): array {
-        return array(
-            'draft' => array(
-                'label' => _x('Draft', 'invoice post status'),
-                'public' => true,
-                'show_in_admin_all_list' => true,
-                'show_in_admin_status_list' => true,
-                'date_floating' => true,
-                'label_count' => _n_noop('Draft <span class="count">(%s)</span>',
-                    'Drafts <span class="count">(%s)</span>')
-            ),
-            'invoice_issued' => array(
-                'label' => _x('Issued', 'invoice post status'),
-                'public' => true,
-                'show_in_admin_all_list' => true,
-                'show_in_admin_status_list' => true,
-                'date_floating' => true,
-                'label_count' => _n_noop('Issued <span class="count">(%s)</span>',
-                    'Issued <span class="count">(%s)</span>')
-            ),
-            'invoice_sent' => array(
-                'label' => _x('Sent', 'invoice post status'),
-                'public' => true,
-                'show_in_admin_all_list' => true,
-                'show_in_admin_status_list' => true,
-                'date_floating' => true,
-                'label_count' => _n_noop('Sent <span class="count">(%s)</span>', 'Sent <span class="count">(%s)</span>')
-            ),
-            'invoice_expired' => array(
-                'label' => _x('Expired', 'invoice post status'),
-                'public' => true,
-                'show_in_admin_all_list' => true,
-                'show_in_admin_status_list' => true,
-                'date_floating' => true,
-                'label_count' => _n_noop('Expired <span class="count">(%s)</span>',
-                    'Expired <span class="count">(%s)</span>')
-            ),
-            'invoice_paid' => array(
-                'label' => _x('Paid', 'invoice post status'),
-                'public' => true,
-                'show_in_admin_all_list' => true,
-                'show_in_admin_status_list' => true,
-                'date_floating' => true,
-                'label_count' => _n_noop('Paid <span class="count">(%s)</span>', 'Paid <span class="count">(%s)</span>')
-            ),
-            'invoice_cancelled' => array(
-                'label' => _x('Cancelled', 'invoice post status'),
-                'public' => true,
-                'show_in_admin_all_list' => true,
-                'show_in_admin_status_list' => true,
-                'date_floating' => true,
-                'label_count' => _n_noop('Cancelled <span class="count">(%s)</span>',
-                    'Cancelled <span class="count">(%s)</span>')
-            ),
-        );
     }
 }

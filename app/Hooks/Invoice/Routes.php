@@ -3,7 +3,7 @@
 namespace Invoice\Hooks\Invoice;
 
 class Routes {
-    public static function add_rewrite_rule(): void {
+    public function add_rewrite_rule(): void {
         add_rewrite_rule(
             'invoices/([^/]+)/?$',
             'index.php?pagename=invoices&invoice_page=$matches[1]',
@@ -29,7 +29,7 @@ class Routes {
         );
     }
 
-    public static function query_vars(array $vars): array {
+    public function query_vars(array $vars): array {
         $vars[] = 'invoice_page';
         $vars[] = 'invoice_action';
         $vars[] = 'uuid';

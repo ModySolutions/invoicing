@@ -2,17 +2,19 @@
 
 namespace Invoice\Hooks;
 
-use Invoice\Hooks\Invoice\Post;
-use Invoice\Hooks\Invoice\Settings;
+use Invoice\Features\Post;
+use Invoice\Features\Settings;
 
 class Plugin {
+    use Post;
+    use Settings;
     const last_update = 'Hipe|Tinky|Margarita|Airwalk';
-    public static function init() : void {
-        add_action('init', self::wp_init(...));
-        add_action('wp_enqueue_scripts', self::wp_enqueue_scripts(...), 100);
+    public function init() : void {
+        add_action('init', array($this, 'wp_init'));
+        add_action('wp_enqueue_scripts', array($this, 'wp_enqueue_scripts'), 100);
     }
 
-    public static function wp_init() : void {
+    public function wp_init() : void {
         $invoice_page_id = get_option('invoice_page_id');
         $invoice_module_last_update = get_option('invoice_option_last_update');
         if(!$invoice_page_id || $invoice_module_last_update !== self::last_update) {
@@ -99,7 +101,7 @@ class Plugin {
         }
     }
 
-    public static function wp_enqueue_scripts() : void {
+    public function wp_enqueue_scripts() : void {
         $app_file = APP_INVOICE_DIR . '/dist/invoice.asset.php';
         if(is_file($app_file) &&
             (is_page('invoices') || is_page('print-invoice')) ||
@@ -116,9 +118,9 @@ class Plugin {
                'app-invoice',
                'Invoice',
                array(
-                   'settings' => Settings::get_settings(),
+                   'settings' => $this->get_settings(),
                    'invoice_page_id' => get_option('invoice_page_id'),
-                   'statuses' => Post::get_statuses_array(),
+                   'statuses' => $this->get_statuses_array(),
                ),
            );
            wp_enqueue_script('app-invoice');
@@ -127,8 +129,7 @@ class Plugin {
                'app-invoice',
                APP_INVOICE_DIR_URL . 'dist/invoice.css',
                [],
-               $app_assets['version'],
-               'all'
+               $app_assets['version']
            );
         }
 

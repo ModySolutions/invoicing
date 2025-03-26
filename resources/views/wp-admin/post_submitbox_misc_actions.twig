@@ -1,0 +1,12 @@
+<script>
+    jQuery(document).ready(function($){
+        $("select#post_status").html('');
+        $("select#post_status").append('{$options}');
+        $("#post-status-display").text('{$label}');
+    });
+</script>
+<style>
+    #publish {
+        display: none;
+    }
+</style>
