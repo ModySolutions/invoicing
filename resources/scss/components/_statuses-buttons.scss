@@ -1,12 +1,14 @@
 button[class*="btn-status"] {
-  &.active {
-    position: relative;
-    &:after {
-      content: ' ';
-      position: absolute;
-      bottom: -0.3125rem;
-      width: 60%;
-      border-bottom: 0.125rem solid var(--color-grey-80, #000);
-    }
-  }
+
+	&.active {
+		position: relative;
+
+		&::after {
+			content: " ";
+			position: absolute;
+			bottom: -0.3125rem;
+			width: 60%;
+			border-bottom: 0.125rem solid var(--color-grey-80, #000);
+		}
+	}
 }

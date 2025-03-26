@@ -13,5 +13,13 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {},
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "laravel/pint": "^1.18"
+    },
+    "scripts": {
+        "lint": "pint --test",
+        "lint:fix": "pint"
+    }
 }

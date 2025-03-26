@@ -2,13 +2,16 @@
 
 namespace Invoice\Features;
 
-trait Schema {
+trait Schema
+{
     use Settings;
-    public function schema($invoice_id, $public = false) : array {
+
+    public function schema($invoice_id, $public = false): array
+    {
         $stored_invoice_series_number = get_field('invoice_series_number', $invoice_id);
         $stored_invoice_number = get_field('invoice_number', $invoice_id);
         $invoice_number = '';
-        if($stored_invoice_series_number) {
+        if ($stored_invoice_series_number) {
             $invoice_number = "{$stored_invoice_number}-";
         }
         $invoice_number .= $stored_invoice_number;
@@ -17,16 +20,16 @@ trait Schema {
         $invoice_view_url = "/invoices/view/{$uuid}";
         $invoice_edit_url = "/invoices/edit/{$uuid}";
 
-        $private_data = array(
+        $private_data = [
             'invoice_client' => get_field('invoice_client', $invoice_id, false),
             'invoice_client_address' => get_field('invoice_client_address', $invoice_id, false),
             'invoice_view_url' => $invoice_view_url,
             'invoice_edit_url' => $invoice_edit_url,
             'invoice_notes' => get_field('invoice_notes', $invoice_id),
             'invoice_terms' => get_field('invoice_terms', $invoice_id),
-        );
+        ];
 
-        $public_data = array(
+        $public_data = [
             'ID' => $invoice_id,
             'UUID' => $uuid,
             'invoice_series_number' => $stored_invoice_series_number,
@@ -35,12 +38,12 @@ trait Schema {
             'invoice_issue_date' => get_field(
                 'invoice_issue_date',
                 $invoice_id,
-                false
+                false,
             ),
             'invoice_due_date' => get_field(
                 'invoice_due_date',
                 $invoice_id,
-                false
+                false,
             ),
             'invoice_sender' => get_field('invoice_sender', $invoice_id, false),
             'invoice_sender_address' => get_field('invoice_sender_address', $invoice_id, false),
@@ -58,7 +61,7 @@ trait Schema {
             'invoice_discount_total' => get_field('invoice_discount_total', $invoice_id),
             'invoice_total' => get_field('invoice_total', $invoice_id),
             'invoice_logo' => $this->get_logo($invoice_id),
-        );
+        ];
 
         return $public ? $public_data : array_merge($public_data, $private_data);
     }

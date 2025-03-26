@@ -1,1 +1,1 @@
-import '@inscss/invoice.scss';
+import '../scss/invoice.scss';

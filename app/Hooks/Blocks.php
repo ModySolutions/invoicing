@@ -2,10 +2,12 @@
 
 namespace Invoice\Hooks;
 
-class Blocks {
-	public function init() : void {
-        add_action('init', array($this, 'register_block_types'));
-	}
+class Blocks
+{
+    public function init(): void
+    {
+        add_action('init', [$this, 'register_block_types']);
+    }
 
     public function register_block_types(): void
     {

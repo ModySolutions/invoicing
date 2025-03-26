@@ -1,27 +1,28 @@
-import React, {createContext, useState, useContext, useEffect} from 'react';
-import apiFetch from "@wordpress/api-fetch";
+// eslint-disable-next-line import/no-unresolved
+import { createContext, useState, useContext, useEffect } from 'react';
 
-const InvoiceContext = createContext(null);
+const InvoiceContext = createContext( null );
 
-export const InvoiceProvider = ({children}) => {
-    const [invoice, setInvoice] = useState(null);
-    const [invoiceUuid, setInvoiceUuid] = useState(null);
+export const InvoiceProvider = ( { children } ) => {
+	const [ invoice, setInvoice ] = useState( null );
+	const [ invoiceUuid, setInvoiceUuid ] = useState( null );
 
-    useEffect(() => {
-    }, [invoice]);
+	useEffect( () => {}, [ invoice ] );
 
-    return (
-        <InvoiceContext.Provider value={{
-            invoice,
-            invoiceUuid,
-            setInvoice,
-            setInvoiceUuid
-        }}>
-            {children}
-        </InvoiceContext.Provider>
-    );
+	return (
+		<InvoiceContext.Provider
+			value={ {
+				invoice,
+				invoiceUuid,
+				setInvoice,
+				setInvoiceUuid,
+			} }
+		>
+			{ children }
+		</InvoiceContext.Provider>
+	);
 };
 
 export const useInvoice = () => {
-    return useContext(InvoiceContext);
+	return useContext( InvoiceContext );
 };
