@@ -47,11 +47,6 @@ jobs:
           restore-keys: |
             node_modules-${{ runner.os }}-
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: nvm use ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:

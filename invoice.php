@@ -20,23 +20,31 @@ define('APP_INVOICE_DIR_URL', plugin_dir_url(__FILE__));
 define('APP_INVOICE_POST_TYPE', 'invoice');
 define('APP_INVOICE_TEMPLATE_DIR', APP_INVOICE_DIR . '/resources/templates/');
 define('APP_INVOICE_VIEWS_DIR', APP_INVOICE_DIR . '/resources/views/');
-define('APP_INVOICE_BLOCK_CONTENT', <<<EOF
+define('APP_INVOICE_BLOCK_CONTENT', <<<'EOF'
 <!-- wp:app/invoice-v2 --><p class="wp-block-app-invoice-v2">Example – hello from the saved content!</p><!-- /wp:app/invoice-v2 -->
 EOF);
 
 require_once __DIR__ . '/vendor/autoload.php';
 class Invoice
 {
-    public static function start() : void {
+    public static function start(): void
+    {
         self::loader(APP_INVOICE_DIR . '/app/Hooks/*.php', 'Invoice\\Hooks\\');
     }
 
-    public static function loader(string $path, string $namespace = 'Invoice\\') : void {
-        foreach(glob($path) as $config_file) {
+    public static function loader(string $path, string $namespace = 'Invoice\\'): void
+    {
+        foreach (glob($path) as $config_file) {
             $class_name = $namespace;
             $class_name .= basename($config_file, '.php');
-            if(method_exists($class_name, 'init')) {
-                $class_name::init();
+            if (method_exists($class_name, 'init')) {
+                $reflection = new \ReflectionMethod($class_name, 'init');
+                if ($reflection->isStatic()) {
+                    $class_name::init();
+                } else {
+                    $object = new $class_name();
+                    ${_wp_to_kebab_case($class_name)} = $object->init();
+                }
             }
         }
     }
