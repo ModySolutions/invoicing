@@ -93,6 +93,9 @@ importers:
       stylelint:
         specifier: ^16.17.0
         version: 16.17.0(typescript@5.8.2)
+      stylelint-config-recommended:
+        specifier: ^15.0.0
+        version: 15.0.0(stylelint@16.17.0(typescript@5.8.2))
       webpack:
         specifier: ^5.98.0
         version: 5.98.0(webpack-cli@6.0.1)
@@ -6330,6 +6333,12 @@ packages:
     engines: {node: '>=18.12.0'}
     peerDependencies:
       stylelint: ^16.1.0
+
+  stylelint-config-recommended@15.0.0:
+    resolution: {integrity: sha512-9LejMFsat7L+NXttdHdTq94byn25TD+82bzGRiV1Pgasl99pWnwipXS5DguTpp3nP1XjvLXVnEJIuYBfsRjRkA==}
+    engines: {node: '>=18.12.0'}
+    peerDependencies:
+      stylelint: ^16.13.0
 
   stylelint-scss@6.11.1:
     resolution: {integrity: sha512-e4rYo0UY+BIMtGeGanghrvHTjcryxgZbyFxUedp8dLFqC4P70aawNdYjRrQxbnKhu3BNr4+lt5e/53tcKXiwFA==}
@@ -14618,7 +14627,7 @@ snapshots:
 
   regenerator-transform@0.15.2:
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.25.7
 
   regexp.prototype.flags@1.5.4:
     dependencies:
@@ -15213,6 +15222,10 @@ snapshots:
       postcss: 8.5.3
 
   stylelint-config-recommended@14.0.1(stylelint@16.17.0(typescript@5.8.2)):
+    dependencies:
+      stylelint: 16.17.0(typescript@5.8.2)
+
+  stylelint-config-recommended@15.0.0(stylelint@16.17.0(typescript@5.8.2)):
     dependencies:
       stylelint: 16.17.0(typescript@5.8.2)
 
