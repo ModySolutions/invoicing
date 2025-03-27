@@ -1,5 +1,4 @@
 {
-  "extends": [ "plugin:@wordpress/eslint-plugin/recommended" ],
   "globals" : {
     "Invoice": "readonly",
     "location": "readonly"
