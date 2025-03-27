@@ -1,10 +1,10 @@
-const CurrencyFormatter = ({ amount, currency = 'EUR' }) => {
-    const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency,
-    }).format(amount);
+const CurrencyFormatter = ( { amount, currency = 'EUR' } ) => {
+	const formatted = new Intl.NumberFormat( 'en-US', {
+		style: 'currency',
+		currency,
+	} ).format( amount );
 
-    return <>{formatted}</>;
+	return <>{ formatted }</>;
 };
 
 export default CurrencyFormatter;
